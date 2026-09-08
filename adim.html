@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <link rel="icon" type="image/png" href="Gemini_Generated_Image_bjczfnbjczfnbjcz (1).jpg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Konumdan Hedefe - AI Yürüyüş Analizi</title>
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    :root {
+      --brand-orange: #fc6A03;
+      --brand-orange-hover: #e05c00;
+      --pure-black: #000000;
+      --surface-black: #111111;
+      --pure-white: #ffffff;
+      --border-dark: #222222;
+      --muted-gray: #888888;
+    }
+
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { margin: 0; padding: 0; background: var(--pure-black); color: var(--pure-white); display: flex; flex-direction: column; height: 100vh; }
+    
+    #map { flex: 1; width: 100%; z-index: 1; background: var(--surface-black); }
+    
+    .panel {
+      background: var(--pure-black);
+      padding: 18px 20px;
+      border-top: 2px solid var(--brand-orange);
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.95);
+      z-index: 10;
+      max-height: 52vh;
+      overflow-y: auto;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-dark);
+      background: var(--surface-black);
+      color: var(--pure-white);
+      font-size: 14px;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--brand-orange);
+      box-shadow: 0 0 0 3px rgba(252, 106, 3, 0.25);
+    }
+
+    .btn-search {
+      background: var(--brand-orange);
+      color: var(--pure-black);
+      border: none;
+      border-radius: 8px;
+      padding: 0 20px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.2s ease;
+    }
+
+    .btn-search:hover {
+      background: var(--brand-orange-hover);
+    }
+
+    .row { display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .status-badge {
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: var(--surface-black);
+      color: var(--brand-orange);
+      border: 1px solid var(--brand-orange);
+      font-weight: 600;
+    }
+    
+    .inputs { display: flex; gap: 10px; margin-bottom: 14px; }
+    .input-field { flex: 1; }
+    label { font-size: 11px; color: var(--pure-white); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; display: block; margin-bottom: 5px; }
+    
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-dark);
+      background: var(--surface-black);
+      color: var(--pure-white);
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--brand-orange);
+    }
+
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .stat-box {
+      background: var(--surface-black);
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid var(--border-dark);
+    }
+    .stat-val { font-size: 20px; font-weight: 900; color: var(--brand-orange); }
+    .stat-lbl { font-size: 11px; color: var(--pure-white); text-transform: uppercase; margin-top: 3px; font-weight: 600; }
+
+    .btn-group { display: flex; gap: 10px; }
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .btn-calc {
+      background: var(--brand-orange);
+      color: var(--pure-black);
+    }
+    .btn-calc:hover {
+      background: var(--brand-orange-hover);
+    }
+    .btn-calc:disabled {
+      background: #222;
+      color: #666;
+      cursor: not-allowed;
+      border: 1px solid #333;
+    }
+
+    .btn-relocate {
+      background: var(--pure-white);
+      color: var(--pure-black);
+      flex: 0.45;
+      font-size: 13px;
+    }
+    .btn-relocate:hover {
+      background: #e5e5e5;
+    }
+
+    .ai-result {
+      margin-top: 16px;
+      background: var(--surface-black);
+      border-left: 4px solid var(--brand-orange);
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--pure-white);
+      display: none;
+    }
+    .ai-title { font-weight: 800; color: var(--brand-orange); margin-bottom: 8px; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+  <div id="map"></div>
+
+  <div class="panel">
+    <div class="search-box">
+      <input type="text" id="aramaInput" class="search-input" placeholder="Yer veya dükkan yazın (örn: BİM, Eczane, MarkAntalya)" onkeydown="if(event.key==='Enter') hedefAra()">
+      <button class="btn-search" onclick="hedefAra()">Rotayı Bul</button>
+    </div>
+
+    <div class="row">
+      <div class="status-badge" id="instruction">GPS konumu alınıyor...</div>
+    </div>
+
+    <div class="inputs">
+      <div class="input-field">
+        <label>Kilonuz (kg)</label>
+        <input type="number" id="kiloInput" value="75">
+      </div>
+      <div class="input-field">
+        <label>Yürüyüş Temposu</label>
+        <select id="tempoSelect">
+          <option value="yavas (4 km/s)">Sakin / Hafif (4 km/s)</option>
+          <option value="orta (5 km/s)" selected>Tempolu / Normal (5 km/s)</option>
+          <option value="hizli (6.5 km/s)">Hızlı / Tempolu (6.5 km/s)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-val" id="mesafeText">0.00 km</div>
+        <div class="stat-lbl">Kuş Uçuşu Mesafe</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="tahminiSureText">0 dk</div>
+        <div class="stat-lbl">Tahmini Yürüyüş Süresi</div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-calc" id="btnAi" onclick="aiKaloriHesapla()" disabled>⚡ Gemini ile Analiz Et</button>
+      <button class="btn btn-relocate" onclick="konumumuBul()">📍 Konumumu Yenile</button>
+    </div>
+
+    <div class="ai-result" id="aiBox">
+      <div class="ai-title">🔥 Yapay Zeka Antrenman Analizi:</div>
+      <div id="aiText">Hesaplanıyor...</div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    // Canlı Render backend endpoint adresi
+    const BACKEND_URL = "https://fitness-backend-opv7.onrender.com/api/analyze-walk";
+
+    let map;
+    let baslangicNoktasi = null;
+    let baslangicMarker = null;
+    let hedefMarker = null;
+    let rotaCizgisi = null;
+    let secilenMesafeKm = 0;
+    let hedefAdi = "";
+
+    function initMap() {
+      map = L.map('map').setView([36.8841, 30.7056], 13);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+      }).addTo(map);
+
+      map.on('click', (e) => hedefAyarla(e.latlng.lat, e.latlng.lng, "Haritada Seçilen Nokta"));
+      konumumuBul();
+    }
+
+    function konumumuBul() {
+      const info = document.getElementById("instruction");
+      info.innerText = "GPS konumu alınıyor...";
+
+      if (!navigator.geolocation) {
+        info.innerText = "Cihazınızda GPS desteği bulunamadı.";
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          baslangicNoktasi = { lat, lng };
+
+          if (baslangicMarker) map.removeLayer(baslangicMarker);
+
+          baslangicMarker = L.circleMarker([lat, lng], {
+            radius: 9,
+            fillColor: "#fc6A03",
+            color: "#ffffff",
+            weight: 3,
+            opacity: 1,
+            fillOpacity: 1
+          }).addTo(map).bindPopup("<b>Buradasınız (Başlangıç)</b>").openPopup();
+
+          map.setView([lat, lng], 15);
+          info.innerText = "Yeri yazıp 'Rotayı Bul'a basın veya haritaya dokunun.";
+
+          if (hedefMarker) {
+            rotayiYenile();
+          }
+        },
+        (err) => {
+          info.innerText = "Konum izni alınamadı, harita üzerinden devam edebilirsiniz.";
+          console.warn(err);
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+
+    async function hedefAra() {
+      const sorgu = document.getElementById("aramaInput").value.trim();
+      const info = document.getElementById("instruction");
+      if (!sorgu) return;
+
+      if (!baslangicNoktasi) {
+        alert("Önce GPS konumunuzun tespit edilmesi gerekiyor.");
+        return;
+      }
+
+      info.innerText = `Size en yakın "${sorgu}" taranıyor...`;
+
+      try {
+        const delta = 0.25;
+        const minLng = baslangicNoktasi.lng - delta;
+        const maxLng = baslangicNoktasi.lng + delta;
+        const minLat = baslangicNoktasi.lat - delta;
+        const maxLat = baslangicNoktasi.lat + delta;
+
+        let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(sorgu)}&viewbox=${minLng},${maxLat},${maxLng},${minLat}&bounded=1&limit=15`;
+        let res = await fetch(url);
+        let data = await res.json();
+
+        if (!data || data.length === 0) {
+          const fallbackUrl = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=tr&q=${encodeURIComponent(sorgu)}&limit=15`;
+          res = await fetch(fallbackUrl);
+          data = await res.json();
+        }
+
+        if (data && data.length > 0) {
+          let enYakinYer = data[0];
+          let enKisaMesafe = map.distance([baslangicNoktasi.lat, baslangicNoktasi.lng], [parseFloat(data[0].lat), parseFloat(data[0].lon)]);
+
+          for (let i = 1; i < data.length; i++) {
+            const m = map.distance([baslangicNoktasi.lat, baslangicNoktasi.lng], [parseFloat(data[i].lat), parseFloat(data[i].lon)]);
+            if (m < enKisaMesafe) {
+              enKisaMesafe = m;
+              enYakinYer = data[i];
+            }
+          }
+
+          const lat = parseFloat(enYakinYer.lat);
+          const lng = parseFloat(enYakinYer.lon);
+          hedefAdi = enYakinYer.display_name.split(",")[0];
+          
+          hedefAyarla(lat, lng, `En Yakın: ${hedefAdi}`);
+          info.innerText = `Size en yakın bulundu: ${hedefAdi} (${(enKisaMesafe / 1000).toFixed(2)} km)`;
+        } else {
+          info.innerText = "Yakınınızda bu isimle bir yer bulunamadı.";
+        }
+      } catch (err) {
+        info.innerText = "Arama servisine bağlanılamadı.";
+      }
+    }
+
+    function hedefAyarla(lat, lng, baslik) {
+      if (!baslangicNoktasi) {
+        alert("Önce GPS konumunuzun gelmesini bekleyin.");
+        return;
+      }
+
+      hedefAdi = baslik;
+
+      if (hedefMarker) {
+        map.removeLayer(hedefMarker);
+      }
+
+      hedefMarker = L.marker([lat, lng]).addTo(map)
+        .bindPopup(`<b>${baslik}</b>`)
+        .openPopup();
+
+      rotayiYenile();
+    }
+
+    function rotayiYenile() {
+      if (!baslangicNoktasi || !hedefMarker) return;
+
+      const hedefLatLng = hedefMarker.getLatLng();
+
+      if (rotaCizgisi) map.removeLayer(rotaCizgisi);
+
+      const noktalar = [
+        [baslangicNoktasi.lat, baslangicNoktasi.lng],
+        [hedefLatLng.lat, hedefLatLng.lng]
+      ];
+
+      rotaCizgisi = L.polyline(noktalar, { color: '#fc6A03', weight: 5, dashArray: '8, 8' }).addTo(map);
+      map.fitBounds(rotaCizgisi.getBounds(), { padding: [50, 50] });
+
+      const mesafeMetre = map.distance([baslangicNoktasi.lat, baslangicNoktasi.lng], [hedefLatLng.lat, hedefLatLng.lng]);
+      secilenMesafeKm = (mesafeMetre / 1000).toFixed(2);
+
+      const dakika = Math.round((secilenMesafeKm / 5) * 60);
+
+      document.getElementById("mesafeText").innerText = `${secilenMesafeKm} km`;
+      document.getElementById("tahminiSureText").innerText = `${dakika} dk`;
+      document.getElementById("btnAi").disabled = false;
+    }
+
+    // Doğrudan Canlı Backend Sunucumuza İstek Atıyoruz
+    async function aiKaloriHesapla() {
+      if (secilenMesafeKm <= 0) return;
+
+      const kilo = document.getElementById("kiloInput").value || 75;
+      const tempo = document.getElementById("tempoSelect").value;
+      const aiBox = document.getElementById("aiBox");
+      const aiText = document.getElementById("aiText");
+
+      aiBox.style.display = "block";
+      aiText.innerText = "Yapay zeka analiz ediyor...";
+
+      try {
+        const response = await fetch(BACKEND_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            hedefAdi: hedefAdi,
+            secilenMesafeKm: secilenMesafeKm,
+            kilo: kilo,
+            tempo: tempo
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          aiText.innerHTML = `<span style="color:#fc6A03; font-weight:bold;">Hata:</span> ${data.error || 'Sunucu hatası'}`;
+          return;
+        }
+
+        aiText.innerText = data.text;
+      } catch (err) {
+        aiText.innerText = "Ağ Hatası: " + err.message;
+      }
+    }
+
+    window.onload = initMap;
+  </script>
+</body>
+</html>

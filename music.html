@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <link rel="icon" type="image/png" href="Gemini_Generated_Image_bjczfnbjczfnbjcz (1).jpg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Mood Playlist Generator</title>
+  <link rel="icon" type="image/png" href="Gemini_Generated_Image_bjczfnbjczfnbjcz (1).jpg">
+  <style>
+  * { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+  }
+  
+  body { 
+    background: #000000; 
+    color: #f8fafc; 
+    min-height: 100vh; 
+    display: flex; 
+    justify-content: center; 
+    padding: 40px 16px; 
+  }
+
+  .container { 
+    width: 100%; 
+    max-width: 600px; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 20px; 
+  }
+  
+  .header h1 { 
+    font-size: 1.6rem; 
+    font-weight: 700; 
+    color: #FF6B00; 
+  }
+  .header p { 
+    color: #a1a1aa; 
+    font-size: 0.9rem; 
+    margin-top: 4px; 
+  }
+
+  .input-box { 
+    display: flex; 
+    gap: 8px; 
+  }
+  input[type="text"] {
+    flex: 1; 
+    padding: 12px 16px; 
+    border-radius: 8px; 
+    border: 1px solid #27272a;
+    background: #121212; 
+    color: #fff; 
+    font-size: 0.95rem; 
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type="text"]:focus { 
+    border-color: #FF6B00; 
+  }
+  
+  button#generate-btn {
+    background: #FF6B00; 
+    color: #000; 
+    border: none; 
+    padding: 12px 20px;
+    border-radius: 8px; 
+    font-weight: 700; 
+    cursor: pointer; 
+    transition: 0.2s;
+  }
+  button#generate-btn:hover { 
+    background: #e05e00; 
+  }
+  button:disabled { 
+    opacity: 0.5; 
+    cursor: not-allowed; 
+  }
+
+  .tags { 
+    display: flex; 
+    gap: 8px; 
+    flex-wrap: wrap; 
+  }
+  .tag {
+    background: #121212; 
+    border: 1px solid #27272a; 
+    color: #d4d4d8;
+    padding: 6px 12px; 
+    border-radius: 20px; 
+    font-size: 0.8rem; 
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .tag:hover { 
+    border-color: #FF6B00; 
+    color: #FF6B00; 
+  }
+
+  .playlist { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+    margin-top: 10px; 
+  }
+  .song-card {
+    background: #121212; 
+    border: 1px solid #27272a; 
+    padding: 14px 16px;
+    border-radius: 8px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    border-left: 3px solid #FF6B00;
+  }
+  .song-info h4 { 
+    font-size: 0.95rem; 
+    color: #ffffff; 
+  }
+  .song-info p { 
+    font-size: 0.8rem; 
+    color: #a1a1aa; 
+    margin-top: 2px; 
+  }
+  .song-info span { 
+    font-size: 0.75rem; 
+    color: #FF6B00; 
+  }
+
+  .links { 
+    display: flex; 
+    gap: 8px; 
+  }
+  .btn-link {
+    padding: 6px 12px; 
+    border-radius: 6px; 
+    text-decoration: none; 
+    font-size: 0.75rem;
+    font-weight: 700; 
+    display: inline-flex; 
+    align-items: center;
+  }
+  .btn-spotify { 
+    background: #1db954; 
+    color: #000; 
+  }
+  .btn-youtube { 
+    background: #ef4444; 
+    color: #fff; 
+  }
+  
+  .loader { 
+    display: none; 
+    text-align: center; 
+    color: #FF6B00; 
+    font-size: 0.9rem; 
+    margin: 15px 0; 
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1>AI Mood Playlist</h1>
+      <p>Aklındaki ortamı veya modu yaz, liste anında gelsin.</p>
+    </div>
+
+    <div class="input-box">
+      <input type="text" id="mood-input" placeholder="Örn: Gece idmanı, yağmurda yürüyüş, 90'lar damar...">
+      <button id="generate-btn" onclick="generatePlaylist()">Listele</button>
+    </div>
+
+    <div class="tags">
+      <div class="tag" onclick="quickSelect('Gece ağır fitness idmanı basış modu')">🔥 Gece İdmanı</div>
+      <div class="tag" onclick="quickSelect('Yağmurlu gecede arabada yolculuk')">🌧️ Yağmurda Yürüyüş</div>
+      <div class="tag" onclick="quickSelect('Damar arabesk gecesi rakı masası')">🚬 Ağır Arabesk</div>
+      <div class="tag" onclick="quickSelect('Gece yarısı uzay ve astronomi izlerken')">🌌 Derin Odak & Ambient</div>
+    </div>
+
+    <div id="loader" class="loader">Yapay zeka şarkıları seçiyor...</div>
+    <div id="playlist" class="playlist"></div>
+  </div>
+
+  <script>
+  // Canlı Render backend endpoint adresi
+  const BACKEND_URL = "https://fitness-backend-opv7.onrender.com/api/generate-playlist";
+
+  function quickSelect(text) {
+    document.getElementById('mood-input').value = text;
+    generatePlaylist();
+  }
+
+  document.getElementById('mood-input').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      generatePlaylist();
+    }
+  });
+
+  async function generatePlaylist() {
+    const mood = document.getElementById('mood-input').value.trim();
+    if (!mood) return;
+
+    const btn = document.getElementById('generate-btn');
+    const loader = document.getElementById('loader');
+    const listContainer = document.getElementById('playlist');
+
+    btn.disabled = true;
+    loader.style.display = 'block';
+    listContainer.innerHTML = '';
+
+    try {
+      // Backend sunucumuza güvenli istek atıyoruz
+      const response = await fetch(BACKEND_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mood: mood })
+      });
+
+      const songs = await response.json();
+
+      if (!response.ok) {
+        throw new Error(songs.error || "Şarkılar getirilemedi.");
+      }
+
+      songs.forEach(song => {
+        const query = encodeURIComponent(`${song.artist} ${song.title}`);
+        const ytUrl = `https://www.youtube.com/results?search_query=${query}`;
+        const spUrl = `https://open.spotify.com/search/${query}`;
+
+        const card = document.createElement('div');
+        card.className = 'song-card';
+        card.innerHTML = `
+          <div class="song-info">
+            <h4>${song.title}</h4>
+            <p>${song.artist}</p>
+            <span>${song.vibe || ''}</span>
+          </div>
+          <div class="links">
+            <a href="${spUrl}" target="_blank" class="btn-link btn-spotify">Spotify</a>
+            <a href="${ytUrl}" target="_blank" class="btn-link btn-youtube">YouTube</a>
+          </div>
+        `;
+        listContainer.appendChild(card);
+      });
+
+    } catch (err) {
+      listContainer.innerHTML = `
+        <div style="background:#1e1414; border:1px solid #7f1d1d; border-radius:8px; padding:12px; color:#f87171; font-size:0.85rem;">
+          <strong>Hata:</strong> ${err.message}
+        </div>
+      `;
+    } finally {
+      btn.disabled = false;
+      loader.style.display = 'none';
+    }
+  }
+  </script>
+</body>
+</html>

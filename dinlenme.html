@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+     <link rel="icon" type="image/png" href="Gemini_Generated_Image_bjczfnbjczfnbjcz (1).jpg">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitBody - Rest Timer & Set Counter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d0f12;
+            --card-bg: rgba(22, 27, 34, 0.85);
+            --primary-color: #fc6A03;
+            --text-color: #ffffff;
+            --text-muted: #8b949e;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --danger-color: #ff4757;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .timer-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 30px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Set / Tekrar Sayacı */
+        .set-counter-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .set-info {
+            text-align: left;
+        }
+
+        .set-info label {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: block;
+            text-transform: uppercase;
+        }
+
+        .set-info span {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .set-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-set {
+            background: var(--border-color);
+            color: #fff;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-set:hover {
+            background: var(--primary-color);
+            color: #000;
+        }
+
+        /* Zamanlayıcı Göstergesi */
+        .timer-display {
+            font-size: 64px;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            color: #fff;
+            margin: 15px 0;
+            text-shadow: 0 0 20px rgba(204, 255, 0, 0.2);
+            transition: color 0.3s;
+        }
+
+        .timer-display.running {
+            color: var(--primary-color);
+        }
+
+        .timer-display.finished {
+            color: var(--danger-color);
+            animation: pulse 0.8s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        /* Hızlı Süre Butonları */
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-preset {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px 0;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-preset:hover, .btn-preset.active {
+            background: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(204, 255, 0, 0.3);
+        }
+
+        /* Ana Aksiyon Butonları */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-main {
+            flex: 2;
+            background: var(--primary-color);
+            color: #000;
+            border: none;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 0 15px rgba(204, 255, 0, 0.3);
+        }
+
+        .btn-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(204, 255, 0, 0.5);
+        }
+
+        .btn-reset {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-reset:hover {
+            background: var(--danger-color);
+            color: #fff;
+            border-color: var(--danger-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="timer-card">
+        <div class="title">⏱️ Rest Timer & Set Tracker</div>
+
+        <!-- Set / Tekrar Takip Alanı -->
+        <div class="set-counter-box">
+            <div class="set-info">
+                <label>Tamamlanan Set</label>
+                <span id="set-count">0</span>
+            </div>
+            <div class="set-controls">
+                <button class="btn-set" id="btn-set-minus">-</button>
+                <button class="btn-set" id="btn-set-plus">+</button>
+            </div>
+        </div>
+
+        <!-- Sayaç Ekranı -->
+        <div class="timer-display" id="timer-display">01:00</div>
+
+        <!-- Hızlı Süre Seçenekleri -->
+        <div class="preset-buttons">
+            <button class="btn-preset" data-time="30">30s</button>
+            <button class="btn-preset active" data-time="60">60s</button>
+            <button class="btn-preset" data-time="90">90s</button>
+            <button class="btn-preset" data-time="120">120s</button>
+        </div>
+
+        <!-- Başlat / Sıfırla Butonları -->
+        <div class="action-buttons">
+            <button class="btn-main" id="btn-start">BAŞLAT</button>
+            <button class="btn-reset" id="btn-reset">SIFIRLA</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedTime = 60; // Varsayılan 60 saniye
+        let timeRemaining = 60;
+        let timerInterval = null;
+        let isRunning = false;
+        let setCounter = 0;
+
+        const display = document.getElementById('timer-display');
+        const startBtn = document.getElementById('btn-start');
+        const resetBtn = document.getElementById('btn-reset');
+        const presetBtns = document.querySelectorAll('.btn-preset');
+        const setCountEl = document.getElementById('set-count');
+        const setPlusBtn = document.getElementById('btn-set-plus');
+        const setMinusBtn = document.getElementById('btn-set-minus');
+
+        // Zaman Formatlama (01:00 şeklinde)
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Zamanlayıcıyı Başlat/Durdur
+        function toggleTimer() {
+            if (isRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        }
+
+        function startTimer() {
+            if (timeRemaining <= 0) timeRemaining = selectedTime;
+            
+            isRunning = true;
+            startBtn.innerText = "DURAKLAT";
+            startBtn.style.background = "var(--danger-color)";
+            startBtn.style.color = "#fff";
+            display.classList.add('running');
+            display.classList.remove('finished');
+
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                display.innerText = formatTime(timeRemaining);
+
+                if (timeRemaining <= 0) {
+                    onTimerFinished();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            isRunning = false;
+            clearInterval(timerInterval);
+            startBtn.innerText = "DEVAM ET";
+            startBtn.style.background = "var(--primary-color)";
+            startBtn.style.color = "#000";
+            display.classList.remove('running');
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timeRemaining = selectedTime;
+            display.innerText = formatTime(timeRemaining);
+            startBtn.innerText = "BAŞLAT";
+            display.classList.remove('finished');
+        }
+
+        // Süre Bittiğinde Çalışacak Fonksiyon
+        function onTimerFinished() {
+            pauseTimer();
+            display.classList.add('finished');
+            startBtn.innerText = "BAŞLAT";
+
+            // Set sayısını otomatik 1 artır
+            setCounter++;
+            setCountEl.innerText = setCounter;
+
+            // Bip Sesi Çıkar (Web Audio API)
+            playAlertSound();
+
+            // Telefonda Titreşim Uyarısı (Eğer destekleniyorsa)
+            if ("vibrate" in navigator) {
+                navigator.vibrate([300, 100, 300, 100, 400]);
+            }
+        }
+
+        // Web Audio API ile Ses Üretme
+        function playAlertSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 tonu
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.8);
+            } catch (e) {
+                console.log("Ses çalınamadı:", e);
+            }
+        }
+
+        // Preset Buton Tıklamaları
+        presetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                presetBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                selectedTime = parseInt(btn.getAttribute('data-time'));
+                resetTimer();
+            });
+        });
+
+        // Event Listeners
+        startBtn.addEventListener('click', toggleTimer);
+        resetBtn.addEventListener('click', resetTimer);
+
+        setPlusBtn.addEventListener('click', () => {
+            setCounter++;
+            setCountEl.innerText = setCounter;
+        });
+
+        setMinusBtn.addEventListener('click', () => {
+            if (setCounter > 0) {
+                setCounter--;
+                setCountEl.innerText = setCounter;
+            }
+        });
+    </script>
+</body>
+</html>

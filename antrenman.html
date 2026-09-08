@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <link rel="icon" type="image/png" href="Gemini_Generated_Image_bjczfnbjczfnbjcz (1).jpg">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitBody - Çoklu Egzersiz & Vücut Haritası</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d0f12;
+            --card-bg: rgba(22, 27, 34, 0.7);
+            --primary-color: #fc6A03;
+            --text-color: #ffffff;
+            --text-muted: #8b949e;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 30px 5%;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+
+        /* Sol Taraf: İnsan Vücudu */
+        .body-section {
+            flex: 1;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            min-height: 520px;
+        }
+
+        .body-header {
+            text-align: center;
+        }
+
+        .body-header h2 {
+            font-size: 18px;
+            color: var(--text-muted);
+        }
+
+        .body-header .view-indicator {
+            font-size: 14px;
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .body-svg {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+            margin: 15px 0;
+        }
+
+        /* Vücut Döndür Butonu */
+        .btn-flip {
+            background: var(--primary-color);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(252, 106, 3, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-flip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(252, 106, 3, 0.5);
+        }
+
+        /* Kas Stilleri */
+        .muscle {
+            fill: #2a303c;
+            stroke: #161b22;
+            stroke-width: 2;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .muscle:hover {
+            fill: #3b4354;
+            filter: drop-shadow(0 0 8px var(--primary-color));
+        }
+
+        .muscle.active {
+            fill: var(--primary-color);
+            filter: drop-shadow(0 0 12px var(--primary-color));
+        }
+
+        /* Sağ Taraf: Egzersiz Listesi ve Videolar */
+        .content-section {
+            flex: 1.5;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .muscle-selector-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-muscle {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+
+        .btn-muscle:hover, .btn-muscle.active {
+            background: var(--primary-color);
+            color: #000;
+            font-weight: 600;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 12px rgba(252, 106, 3, 0.4);
+        }
+
+        .section-main-title {
+            font-size: 24px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .exercise-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            max-height: 650px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .exercise-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .exercise-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .exercise-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .exercise-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .video-container {
+            width: 100%;
+            aspect-ratio: 9/16;
+            max-height: 460px;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .exercise-info {
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Sol Panel: Vücut Haritası -->
+        <div class="body-section">
+            <div class="body-header">
+                <h2>Bölge Seçmek İçin Dokun</h2>
+                <div class="view-indicator" id="view-title">ÖN GÖRÜNÜM</div>
+            </div>
+
+            <!-- Ön Vücut SVG -->
+            <svg id="svg-front" class="body-svg" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="100" cy="35" r="20" fill="#2a303c" />
+                <path class="muscle" data-muscle="boyun" d="M 92 53 L 108 53 L 108 68 L 92 68 Z" />
+                
+                <!-- Ön Omuzlar -->
+                <path class="muscle" data-muscle="omuz" d="M 74 65 C 64 66, 46 72, 48 95 C 50 106, 62 104, 68 88 C 72 80, 75 72, 74 65 Z" />
+                <path class="muscle" data-muscle="omuz" d="M 126 65 C 136 66, 154 72, 152 95 C 150 106, 138 104, 132 88 C 128 80, 125 72, 126 65 Z" />
+
+                <!-- Göğüs -->
+                <path class="muscle active" data-muscle="gogus" d="M 73 78 C 85 75, 98 75, 99 98 C 80 100, 72 95, 73 78 Z" />
+                <path class="muscle active" data-muscle="gogus" d="M 127 78 C 115 75, 102 75, 101 98 C 120 100, 128 95, 127 78 Z" />
+                
+                <!-- Ön Kol (Biceps) -->
+                <path class="muscle" data-muscle="on-kol" d="M 50 102 C 45 116, 48 135, 56 140 C 63 135, 62 116, 56 102 Z" />
+                <path class="muscle" data-muscle="on-kol" d="M 150 102 C 155 116, 152 135, 144 140 C 137 135, 138 116, 144 102 Z" />
+                
+                <!-- Bilek -->
+                <path class="muscle" data-muscle="bilek" d="M 45 143 C 40 155, 42 170, 48 175 C 53 170, 55 155, 53 143 Z" />
+                <path class="muscle" data-muscle="bilek" d="M 155 143 C 160 155, 158 170, 152 175 C 147 170, 145 155, 147 143 Z" />
+                
+                <!-- Karın -->
+                <path class="muscle" data-muscle="karin" d="M 78 102 L 122 102 L 118 165 L 82 165 Z" />
+                
+                <!-- Bacak Ön (Quadriceps) -->
+                <path class="muscle" data-muscle="bacak" d="M 75 170 L 97 170 L 93 280 L 70 280 Z" />
+                <path class="muscle" data-muscle="bacak" d="M 125 170 L 103 170 L 107 280 L 130 280 Z" />
+
+                <!-- Kalf Ön -->
+                <path class="muscle" data-muscle="kalf" d="M 70 285 L 93 285 L 88 350 L 73 350 Z" />
+                <path class="muscle" data-muscle="kalf" d="M 130 285 L 107 285 L 112 350 L 127 350 Z" />
+            </svg>
+
+            <!-- Arka Vücut SVG -->
+            <svg id="svg-back" class="body-svg" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                <circle cx="100" cy="35" r="20" fill="#2a303c" />
+                <path class="muscle" data-muscle="boyun" d="M 94 53 L 106 53 L 106 63 L 94 63 Z" />
+                <path class="muscle" data-muscle="trapez" d="M 94 63 L 106 63 L 122 75 L 100 95 L 78 75 Z" />
+                
+                <!-- Arka Omuz -->
+                <path class="muscle" data-muscle="omuz" d="M 74 65 C 64 66, 46 72, 48 95 C 50 106, 62 104, 68 88 C 72 80, 75 72, 74 65 Z" />
+                <path class="muscle" data-muscle="omuz" d="M 126 65 C 136 66, 154 72, 152 95 C 150 106, 138 104, 132 88 C 128 80, 125 72, 126 65 Z" />
+
+                <!-- Sırt -->
+                <path class="muscle" data-muscle="sirt" d="M 78 95 L 100 95 L 86 140 L 73 125 Z" />
+                <path class="muscle" data-muscle="sirt" d="M 122 95 L 100 95 L 114 140 L 127 125 Z" />
+                
+                <!-- Bel -->
+                <path class="muscle" data-muscle="bel" d="M 86 142 L 114 142 L 118 165 L 82 165 Z" />
+                
+                <!-- Arka Kol (Triceps) -->
+                <path class="muscle" data-muscle="arka-kol" d="M 50 102 C 45 116, 48 135, 56 140 C 63 135, 62 116, 56 102 Z" />
+                <path class="muscle" data-muscle="arka-kol" d="M 150 102 C 155 116, 152 135, 144 140 C 137 135, 138 116, 144 102 Z" />
+                
+                <!-- Bilek Arka -->
+                <path class="muscle" data-muscle="bilek" d="M 45 143 C 40 155, 42 170, 48 175 C 53 170, 55 155, 53 143 Z" />
+                <path class="muscle" data-muscle="bilek" d="M 155 143 C 160 155, 158 170, 152 175 C 147 170, 145 155, 147 143 Z" />
+                
+                <!-- Bacak Arka (Hamstring) -->
+                <path class="muscle" data-muscle="bacak" d="M 75 170 L 97 170 L 93 280 L 70 280 Z" />
+                <path class="muscle" data-muscle="bacak" d="M 125 170 L 103 170 L 107 280 L 130 280 Z" />
+
+                <!-- Kalf Arka -->
+                <path class="muscle" data-muscle="kalf" d="M 70 285 L 93 285 L 88 350 L 73 350 Z" />
+                <path class="muscle" data-muscle="kalf" d="M 130 285 L 107 285 L 112 350 L 127 350 Z" />
+            </svg>
+
+            <!-- Vücudu Döndür Butonu -->
+            <button class="btn-flip" id="flip-btn">🔄 Vücudu Döndür</button>
+        </div>
+
+        <!-- Sağ Panel: Liste ve Butonlar -->
+        <div class="content-section">
+            <div class="muscle-selector-buttons">
+                <button class="btn-muscle active" data-target="gogus">Göğüs</button>
+                <button class="btn-muscle" data-target="omuz">Omuz</button>
+                <button class="btn-muscle" data-target="boyun">Boyun</button>
+                <button class="btn-muscle" data-target="trapez">Trapez</button>
+                <button class="btn-muscle" data-target="on-kol">Ön Kol (Biceps)</button>
+                <button class="btn-muscle" data-target="arka-kol">Arka Kol (Triceps)</button>
+                <button class="btn-muscle" data-target="bilek">Bilek</button>
+                <button class="btn-muscle" data-target="sirt">Sırt</button>
+                <button class="btn-muscle" data-target="bel">Bel</button>
+                <button class="btn-muscle" data-target="karin">Karın</button>
+                <button class="btn-muscle" data-target="bacak">Bacak</button>
+                <button class="btn-muscle" data-target="kalf">Kalf (Calf)</button>
+            </div>
+
+            <h2 class="section-main-title" id="muscle-title">Göğüs Egzersizleri</h2>
+
+            <div class="exercise-list" id="exercise-list-container">
+                <!-- Javascript dinamik dolduracak -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const exerciseData = {
+            boyun: {
+                title: "Boyun Egzersizleri",
+                view: "front",
+                items: [
+                    { name: "Boyun Antrenmanı 1", desc: "Boyun omurları ve boyun kaslarını güçlendirme hareketi.", video: "videos/boyun1.mp4" },
+                    { name: "Boyun Antrenmanı 2", desc: "Boyun stabilitesi ve boyun kalınlığı için direnç çalışması.", video: "videos/boyun2.mp4" }
+                ]
+            },
+            trapez: {
+                title: "Trapez Egzersizleri",
+                view: "back",
+                items: [
+                    { name: "Trapez Egzersizi", desc: "Üst sırt ve boyun hattındaki trapez kaslarını hacimlendirir.", video: "videos/trapez.mp4" }
+                ]
+            },
+            gogus: {
+                title: "Göğüs Egzersizleri",
+                view: "front",
+                items: [
+                    { name: "Bench Press", desc: "Tüm göğüs bölgesi için temel kuvvet ve kütle egzersizi.", video: "videos/bench press.mp4" },
+                    { name: "Incline Barbell Press", desc: "Üst göğüs liflerini hedefler.", video: "videos/incline bar press.mp4" },
+                    { name: "Incline Dumbbell Press", desc: "Üst göğüste daha geniş hareket aralığı ve izolasyon sağlar.", video: "videos/incline dumble press.mp4" },
+                    { name: "Incline Smith Machine", desc: "Smith makinesinde kontrollü üst göğüs presi.", video: "videos/incline smit machine.mp4" },
+                    { name: "Dumbbell Press", desc: "Serbest ağırlıkla dengeli göğüs gelişimi sağlar.", video: "videos/dumble press.mp4" },
+                    { name: "Chest Press", desc: "Makinede stabil göğüs presi çalışması.", video: "videos/chest press.mp4" },
+                    { name: "Machine Press", desc: "Makinede kontrollü ve güvenli göğüs presi.", video: "videos/machine press.mp4" },
+                    { name: "Pec Fly", desc: "Göğüs kaslarını sıkıştırıp esnetmek için izolasyon hareketi.", video: "videos/pec fly.mp4" },
+                    { name: "Fly", desc: "Göğüs kas liflerine maksimum gerilim uygular.", video: "videos/fly.mp4" },
+                    { name: "Bot Bar Press", desc: "Alt göğüs ve göğüs bitiş hattı için etkili pres.", video: "videos/bot bar press.mp4" }
+                ]
+            },
+            omuz: {
+                title: "Omuz Egzersizleri",
+                view: "front",
+                items: [
+                    { name: "Shoulder Press", desc: "Ön ve yan omuz başlarını hacimlendiren temel pres egzersizi.", video: "videos/shoulder press.mp4" },
+                    { name: "Shoulder Press 2", desc: "Alternatif omuz pres varyasyonu.", video: "videos/shoulder2.mp4" },
+                    { name: "Lateral Raise", desc: "Yan omuzları genişletmek ve 3D görüntü için izolasyon hareketi.", video: "videos/lateral raise.mp4" },
+                    { name: "Cable Lateral Raise", desc: "Kablo gerilimi sayesinde hareket boyunca sabit direnç sağlar.", video: "videos/cable lateral.mp4" },
+                    { name: "Arka Omuz", desc: "Arka omuz başlarını hedefleyerek omuz simetrisini tamamlar.", video: "videos/arka omuz.mp4" }
+                ]
+            },
+            "on-kol": {
+                title: "Ön Kol / Biceps Egzersizleri",
+                view: "front",
+                items: [
+                    { name: "Biceps Curl", desc: "Biceps kasının tepe noktası ve kütlesi için ana egzersiz.", video: "videos/bıceps curl.mp4" },
+                    { name: "Curl", desc: "Alternatif biceps bükme varyasyonu.", video: "videos/curl.mp4" },
+                    { name: "Hammer Curl", desc: "Brachialis kasını hedefleyerek kol kalınlığını artırır.", video: "videos/hamer curl.mp4" }
+                ]
+            },
+            "arka-kol": {
+                title: "Arka Kol / Triceps Egzersizleri",
+                view: "back",
+                items: [
+                    { name: "Triceps Pushdown / Extension", desc: "Arka kol kaslarını izole eden temel açış.", video: "videos/triceps.mp4" },
+                    { name: "Triceps Arka Kol", desc: "Arka kol başlarını izole edip gerginlik oluşturan hareket.", video: "videos/triceps arka.mp4" },
+                    { name: "Triceps Arka Kol Varyasyon", desc: "Arka kolun uzun başını hedefleyen izolasyon çalışması.", video: "videos/trıceps arka kol.mp4" },
+                    { name: "Dips", desc: "Vücut ağırlığıyla arka kol ve alt göğsü zorlayan bileşik egzersiz.", video: "videos/dips.mp4" }
+                ]
+            },
+            bilek: {
+                title: "Bilek ve Ön Kol Egzersizleri",
+                view: "front",
+                items: [
+                    { name: "Bilek Egzersizi 1", desc: "Bilek ve kavrama kuvveti için fleksiyon çalışması.", video: "videos/bilek.mp4" },
+                    { name: "Bilek Egzersizi 2", desc: "Ön kol kas kalınlığı ve bilek direnci egzersizi.", video: "videos/bilek2.mp4" },
+                    { name: "Bilek Egzersizi 3", desc: "Kavrama ve bilek dayanıklılığı varyasyonu.", video: "videos/bilek3.mp4" }
+                ]
+            },
+            sirt: {
+                title: "Sırt ve Kanat Egzersizleri",
+                view: "back",
+                items: [
+                    { name: "Lat Pulldown", desc: "Sırtın V-formunda genişlemesini sağlayan temel hareket.", video: "videos/lat pulldown.mp4" },
+                    { name: "Barbell Row", desc: "Sırt kalınlığı ve orta sırt hacmi için temel çekiş.", video: "videos/barbel row.mp4" },
+                    { name: "Row Machine", desc: "Makinede kontrollü sırt ve kanat çekişi.", video: "videos/row machine.mp4" },
+                    { name: "Row Sehpa", desc: "Sehpada destekli sırt ve kürek kemiği sıkıştırma egzersizi.", video: "videos/row sepha.mp4" },
+                    { name: "Sırt Esnetme", desc: "Kanat ve sırt liflerini uzatarak toparlanmayı hızlandırır.", video: "videos/sırt esnetme.mp4" }
+                ]
+            },
+            bel: {
+                title: "Bel ve Alt Sırt Egzersizleri",
+                view: "back",
+                items: [
+                    { name: "Bel Egzersizi", desc: "Alt sırtı ve bel omurlarını destekleyen kasları güçlendirir.", video: "videos/bel.mp4" },
+                    { name: "Deadlift", desc: "Tüm arka zinciri, beli ve kalçayı çalıştıran kuvvet hareketi.", video: "videos/deadlift.mp4" }
+                ]
+            },
+            karin: {
+                title: "Karın (Core) Egzersizleri",
+                view: "front",
+                items: [
+                    { name: "Cable Crunch", desc: "Kablo direnciyle üst ve orta karın kaslarını belirginleştirir.", video: "videos/cable crrunch.mp4" },
+                    { name: "Karın Egzersizi 2", desc: "Karın ve merkez bölge stabilizasyonu için varyasyon.", video: "videos/karın2.mp4" }
+                ]
+            },
+            bacak: {
+                title: "Bacak Egzersizleri",
+                view: "front",
+                items: [
+                    { name: "Squat", desc: "Tüm bacak, kalça ve merkez bölge için temel güç hareketi.", video: "videos/squat.mp4" },
+                    { name: "Sup Squat", desc: "İç bacak ve kalça odaklı squat varyasyonu.", video: "videos/sup squat.mp4" },
+                    { name: "Leg Press", desc: "Yüksek ağırlıkla kuadriseps ve bacak yüklemesi.", video: "videos/leg press.mp4" },
+                    { name: "Leg Extension", desc: "Ön bacak (quadriceps) kaslarını izole eden bacak açma hareketi.", video: "videos/extenshion.mp4" },
+                    { name: "Leg Curl", desc: "Arka bacak (hamstring) kaslarını izole eden bükme hareketi.", video: "videos/leg curl.mp4" }
+                ]
+            },
+            kalf: {
+                title: "Kalf (Baldır) Egzersizleri",
+                view: "back",
+                items: [
+                    { name: "Calf Raise", desc: "Alt bacak ve baldır kaslarını izole edip kalınlaştıran hareket.", video: "videos/calf.mp4" }
+                ]
+            }
+        };
+
+        let currentView = 'front';
+
+        const svgFront = document.getElementById('svg-front');
+        const svgBack = document.getElementById('svg-back');
+        const flipBtn = document.getElementById('flip-btn');
+        const viewTitle = document.getElementById('view-title');
+        const muscleTitle = document.getElementById('muscle-title');
+        const listContainer = document.getElementById('exercise-list-container');
+
+        flipBtn.addEventListener('click', toggleBodyView);
+
+        function toggleBodyView() {
+            if (currentView === 'front') {
+                svgFront.style.display = 'none';
+                svgBack.style.display = 'block';
+                currentView = 'back';
+                viewTitle.innerText = 'ARKA GÖRÜNÜM';
+            } else {
+                svgFront.style.display = 'block';
+                svgBack.style.display = 'none';
+                currentView = 'front';
+                viewTitle.innerText = 'ÖN GÖRÜNÜM';
+            }
+        }
+
+        function updateMuscleView(key) {
+            const data = exerciseData[key];
+            if (!data) return;
+
+            if (data.view !== currentView) {
+                toggleBodyView();
+            }
+
+            document.querySelectorAll('.muscle').forEach(m => m.classList.remove('active'));
+            document.querySelectorAll('.btn-muscle').forEach(b => b.classList.remove('active'));
+
+            document.querySelectorAll(`.muscle[data-muscle="${key}"]`).forEach(m => m.classList.add('active'));
+            document.querySelectorAll(`.btn-muscle[data-target="${key}"]`).forEach(b => b.classList.add('active'));
+
+            muscleTitle.innerText = data.title;
+
+            listContainer.innerHTML = '';
+            data.items.forEach(ex => {
+                const card = document.createElement('div');
+                card.className = 'exercise-card';
+                card.innerHTML = `
+                    <div class="exercise-card-title">${ex.name}</div>
+                    <div class="video-container">
+                        <video controls playsinline preload="metadata">
+                            <source src="${encodeURI(ex.video)}" type="video/mp4">
+                            Video oynatılamadı.
+                        </video>
+                    </div>
+                    <div class="exercise-info">${ex.desc}</div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        document.querySelectorAll('.muscle').forEach(item => {
+            item.addEventListener('click', () => {
+                const muscleKey = item.getAttribute('data-muscle');
+                updateMuscleView(muscleKey);
+            });
+        });
+
+        document.querySelectorAll('.btn-muscle').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetKey = btn.getAttribute('data-target');
+                updateMuscleView(targetKey);
+            });
+        });
+
+        updateMuscleView('gogus');
+    </script>
+</body>
+</html>
