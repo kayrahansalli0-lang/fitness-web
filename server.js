@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const yts = require('yt-search'); // YouTube arama motoru eklendi
+const yts = require('yt-search'); // YouTube motoru eklendi
 
 dotenv.config({ path: path.join(__dirname, '.env') });
 
@@ -14,13 +14,13 @@ app.use(express.json({ limit: '10mb' }));
 app.use(cors());
 
 // --- AKILLI ÖNBELLEK (CACHE) ---
-// Aynı şarkılar tekrar tekrar YouTube'da aranıp sunucuyu yormasın
+// Aynı parçaları tekrar tekrar YouTube'da aratıp sistemi yormasın
 const videoCache = new Map();
 
 async function getYouTubeVideoId(title, artist) {
   const cacheKey = `${artist} - ${title}`.toLowerCase().trim();
 
-  // 1. Hafızada varsa 0 saniyede oradan çek
+  // 1. Önbellekte varsa direkt oradan al (0 milisaniye)
   if (videoCache.has(cacheKey)) {
     return videoCache.get(cacheKey);
   }
