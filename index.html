@@ -4,8 +4,16 @@
   <link rel="icon" type="image/png" href="Gemini_Generated_Image_bjczfnbjczfnbjcz (1).jpg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Fitness PR</title>
+  <title>fitness PR</title>
   
+  <!-- PWA ve Mobil Uygulama Meta Etiketleri -->
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="fitness PR">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Font Awesome İkon Kütüphanesi -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
@@ -162,7 +170,77 @@
       font-weight: 600;
     }
 
-    /* Ön Sayfadaki Gömülü Çerçeve */
+    /* Topluluk & Instagram Kartı */
+    .community-card {
+      background: linear-gradient(135deg, #18120e, #141414);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--primary-orange);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .community-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .community-info i {
+      font-size: 1.8rem;
+      color: var(--primary-orange);
+    }
+
+    .community-tag {
+      font-size: 0.7rem;
+      color: var(--primary-orange);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .community-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #fff;
+      margin-top: 2px;
+    }
+
+    .community-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.3;
+    }
+
+    .community-btn {
+      background: var(--primary-orange);
+      color: #000;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .community-btn:hover {
+      opacity: 0.9;
+    }
+
+    .community-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* Ön Sayfadaki Gömülü Müzik Çerçevesi */
     .home-custom-frame {
       width: 100%;
       height: 380px;
@@ -316,6 +394,7 @@
   
   <main class="content-area">
     
+    <!-- 1. ÖN SAYFA -->
     <div id="home-page" class="tab-content active">
       <div class="home-header">
         <img src="Gemini_Generated_Image_bjczfnbjczfnbjcz (1).jpg" onerror="this.src='https://via.placeholder.com/52/161616/ff6b00?text=FIT'" alt="Profil" class="header-avatar" />
@@ -345,31 +424,53 @@
         </div>
       </div>
 
+      <!-- Kendi Topluluğunu Büyüt: Instagram Kartı -->
+      <div class="community-card">
+        <div class="community-info">
+          <i class="fa-brands fa-instagram"></i>
+          <div>
+            <div class="community-tag">FITNESS PR TOPLULUĞU</div>
+            <div class="community-title">Tarifini & PR'ını Paylaşalım!</div>
+            <div class="community-desc">Yüksek proteinli tariflerini veya antrenmanını DM'den at, hesapta öne çıkaralım.</div>
+          </div>
+        </div>
+        <!-- Buradaki linke kendi kullanıcı adını yaz -->
+        <a href="https://instagram.com/fitnesspr" target="_blank" rel="noopener noreferrer" class="community-btn">
+          DM At <i class="fa-solid fa-paper-plane"></i>
+        </a>
+      </div>
+
       <div class="home-custom-frame">
-        <iframe src="music.html"></iframe>
+        <iframe src="music.html" loading="lazy"></iframe>
       </div>
     </div>
     
+    <!-- 2. ADIM SAYFASI -->
     <div id="adim-page" class="tab-content" style="padding: 0;">
-      <iframe src="adim.html" style="width: 100%; height: 100%; border: none;"></iframe>
+      <iframe src="adim.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
+    <!-- 3. PLAYLIST SAYFASI -->
     <div id="music-page" class="tab-content" style="padding: 0;">
-      <iframe src="music.html" style="width: 100%; height: 100%; border: none;"></iframe>
+      <iframe src="music.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
+    <!-- 4. KALORİ SAYFASI -->
     <div id="kalori-page" class="tab-content" style="padding: 0;">
-      <iframe src="kalori.html" style="width: 100%; height: 100%; border: none;"></iframe>
+      <iframe src="kalori.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
+    <!-- 5. ANTRENMAN SAYFASI -->
     <div id="antrenman-page" class="tab-content" style="padding: 0;">
-      <iframe src="antrenman.html" style="width: 100%; height: 100%; border: none;"></iframe>
+      <iframe src="antrenman.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
+    <!-- 6. DİNLENME SAYFASI -->
     <div id="dinlenme-page" class="tab-content" style="padding: 0;">
-      <iframe src="dinlenme.html" style="width: 100%; height: 100%; border: none;"></iframe>
+      <iframe src="dinlenme.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
+    <!-- 7. SU SAYFASI -->
     <div id="su-page" class="tab-content">
       <div class="water-container">
         <div class="water-card">
@@ -395,6 +496,7 @@
 
   </main>
 
+  <!-- ALT SABİT MENÜ -->
   <nav class="bottom-nav">
     <div class="nav-item active" data-target="home-page">
       <i class="fa-solid fa-house"></i>
@@ -524,6 +626,15 @@
       const amount = localStorage.getItem('water_tracker_amount') || '0';
       document.getElementById('waterDisplay').textContent = `${amount} ml`;
       document.getElementById('homeWaterDisplay').textContent = `${amount} ml`;
+    }
+
+    // Service Worker Kaydı (PWA Kurulumu İçin)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('PWA Service Worker Aktif:', reg.scope))
+          .catch(err => console.log('Service Worker Hatası:', err));
+      });
     }
 
     setDailyQuote();
