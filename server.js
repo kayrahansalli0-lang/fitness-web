@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const yts = require('yt-search'); // YouTube motoru eklendi
+const yts = require('yt-search');
 
 dotenv.config({ path: path.join(__dirname, '.env') });
 
@@ -14,13 +14,11 @@ app.use(express.json({ limit: '10mb' }));
 app.use(cors());
 
 // --- AKILLI ÖNBELLEK (CACHE) ---
-// Aynı parçaları tekrar tekrar YouTube'da aratıp sistemi yormasın
 const videoCache = new Map();
 
 async function getYouTubeVideoId(title, artist) {
   const cacheKey = `${artist} - ${title}`.toLowerCase().trim();
 
-  // 1. Önbellekte varsa direkt oradan al (0 milisaniye)
   if (videoCache.has(cacheKey)) {
     return videoCache.get(cacheKey);
   }
@@ -31,7 +29,6 @@ async function getYouTubeVideoId(title, artist) {
     const video = searchResult.videos && searchResult.videos[0];
     const videoId = video ? video.videoId : null;
 
-    // Bellek şişmesin diye 3000 parçada bir sıfırla ve kaydet
     if (videoId) {
       if (videoCache.size > 3000) videoCache.clear();
       videoCache.set(cacheKey, videoId);
@@ -82,7 +79,7 @@ app.post('/api/analyze-food', async (req, res) => {
   }
 });
 
-// 2. ENDPOINT: AI Mood Playlist (YOUTUBE ID ENTEGRE EDİLMİŞ HALİ)
+// 2. ENDPOINT: AI Mood Playlist (GÜNCELLENEN KISIM)
 app.post('/api/generate-playlist', async (req, res) => {
   try {
     const { mood } = req.body;
@@ -118,6 +115,7 @@ Format:
 
     if (!response.ok) {
       const errData = await response.json();
+      console.error("Gemini Yanıt Hatası:", errData);
       throw new Error(errData.error?.message || `Gemini API Hatası: ${response.status}`);
     }
 
@@ -126,20 +124,22 @@ Format:
     const cleanJson = rawText.replace(/```json/gi, "").replace(/```/g, "").trim();
     const songs = JSON.parse(cleanJson);
 
-    // 8 şarkının YouTube ID'sini aynı anda (paralel) buluyoruz
+    // YouTube araması hata verse bile şarkıların gelmesini engellemez
     const songsWithVideos = await Promise.all(
       songs.map(async (song) => {
-        const videoId = await getYouTubeVideoId(song.title, song.artist);
-        return {
-          ...song,
-          videoId: videoId
-        };
+        try {
+          const videoId = await getYouTubeVideoId(song.title, song.artist);
+          return { ...song, videoId: videoId };
+        } catch (ytErr) {
+          console.error("YouTube arama tekil hata:", ytErr.message);
+          return { ...song, videoId: null };
+        }
       })
     );
 
     res.json(songsWithVideos);
   } catch (err) {
-    console.error("Playlist üretme hatası:", err);
+    console.error("KRİTİK PLAYLIST HATASI:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
