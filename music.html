@@ -18,12 +18,12 @@
     min-height: 100vh; 
     display: flex; 
     justify-content: center; 
-    padding: 40px 16px 140px 16px; /* Mini çaların içeriği kapatmaması için alttan padding verildi */
+    padding: 40px 16px 80px 16px; 
   }
 
   .container { 
     width: 100%; 
-    max-width: 600px; 
+    max-width: 650px; 
     display: flex; 
     flex-direction: column; 
     gap: 20px; 
@@ -103,74 +103,81 @@
     align-items: center;
     margin-top: 10px;
   }
-  .btn-play-all {
-    background: #22c55e;
-    color: #000;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    cursor: pointer;
-  }
 
   .playlist { 
     display: flex; 
     flex-direction: column; 
-    gap: 10px; 
+    gap: 12px; 
     margin-top: 5px; 
   }
+  
   .song-card {
     background: #121212; 
     border: 1px solid #27272a; 
-    padding: 12px 16px; 
-    border-radius: 8px; 
+    padding: 14px 16px; 
+    border-radius: 10px; 
     display: flex; 
     justify-content: space-between; 
     align-items: center;
     border-left: 3px solid #FF6B00;
     transition: transform 0.15s, border-color 0.15s;
-    cursor: pointer;
   }
-  .song-card:hover {
-    transform: translateX(4px);
-    border-color: #FF6B00;
+  .song-card:hover { 
+    transform: translateX(4px); 
+    border-color: #FF6B00; 
   }
-  .song-card.active-song {
-    background: #1c150c;
-    border-color: #FF6B00;
+  
+  .song-info {
+    max-width: 60%;
   }
   .song-info h4 { 
     font-size: 0.95rem; 
     color: #ffffff; 
+    margin-bottom: 2px;
   }
   .song-info p { 
     font-size: 0.8rem; 
     color: #a1a1aa; 
-    margin-top: 2px; 
+    margin-bottom: 4px;
   }
   .song-info span { 
     font-size: 0.75rem; 
     color: #FF6B00; 
   }
 
-  .links { 
-    display: flex; 
-    align-items: center;
-    gap: 8px; 
-  }
-  .btn-play-song {
-    background: #FF6B00;
-    color: #000;
-    border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
+  /* Dinleme Butonları */
+  .action-buttons {
     display: flex;
+    gap: 8px;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-weight: bold;
+  }
+
+  .btn-play {
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 8px 12px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: transform 0.15s, opacity 0.15s;
+  }
+  .btn-play:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+
+  /* YouTube Butonu */
+  .btn-yt {
+    background: #FF0000;
+    color: #ffffff;
+  }
+
+  /* Spotify Butonu */
+  .btn-sp {
+    background: #1DB954;
+    color: #000000;
   }
 
   .loader { 
@@ -181,94 +188,14 @@
     margin: 15px 0; 
     font-weight: 600;
   }
-
-  /* Sabit Alt Mini Çalar (Sticky Bottom Player) */
-  .bottom-player {
-    position: fixed;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 32px);
-    max-width: 600px;
-    background: #141416;
-    border: 1px solid #27272a;
-    border-top: 2px solid #FF6B00;
-    border-radius: 12px;
-    padding: 12px 16px;
-    display: none; /* Şarkı başlayınca flex olacak */
-    flex-direction: column;
-    gap: 10px;
-    box-shadow: 0 10px 35px rgba(0,0,0,0.9);
-    z-index: 9999;
-  }
-  .player-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .player-meta {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 70%;
-  }
-  .player-meta .title {
-    font-size: 0.9rem;
-    font-weight: bold;
-    color: #fff;
-  }
-  .player-meta .artist {
-    font-size: 0.75rem;
-    color: #a1a1aa;
-  }
-  .player-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .ctrl-btn {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 1.1rem;
-    cursor: pointer;
-    padding: 4px;
-    transition: color 0.15s;
-  }
-  .ctrl-btn:hover {
-    color: #FF6B00;
-  }
-  .ctrl-play-pause {
-    background: #FF6B00;
-    color: #000;
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.9rem;
-  }
-  /* YouTube oynatıcı penceresi - mini video görünümü */
-  .yt-embed-box {
-    width: 100%;
-    height: 120px;
-    border-radius: 6px;
-    overflow: hidden;
-    background: #000;
-  }
-  #yt-player {
-    width: 100%;
-    height: 100%;
-  }
-</style>
+  </style>
 </head>
 <body>
 
   <div class="container">
     <div class="header">
       <h1>AI Mood Playlist</h1>
-      <p>Aklındaki ortamı veya modu yaz, liste anında gelsin ve çalsın.</p>
+      <p>Modunu seç veya yaz; listeni hazırla, ister YouTube ister Spotify'da dinle.</p>
     </div>
 
     <div class="input-box">
@@ -279,157 +206,21 @@
     <div class="tags">
       <div class="tag" onclick="quickSelect('Gece ağır fitness idmanı basış modu')">🔥 Gece İdmanı</div>
       <div class="tag" onclick="quickSelect('Yağmurlu gecede arabada yolculuk')">🌧️ Yağmurda Yürüyüş</div>
-      <div class="tag" onclick="quickSelect('Damar arabesk gecesi rakı masası')">🚬 Ağır Arabesk</div>
+      <div class="tag" onclick="quickSelect('Damar arabesk gecesi')">🚬 Ağır Arabesk</div>
       <div class="tag" onclick="quickSelect('Gece yarısı uzay ve astronomi izlerken')">🌌 Derin Odak & Ambient</div>
     </div>
 
-    <div id="loader" class="loader">Yapay zeka ortamına uygun parçaları seçiyor...</div>
+    <div id="loader" class="loader">Yapay zeka moduna uygun şarkıları seçiyor...</div>
 
     <div id="playlist-actions" class="playlist-header-actions">
       <span style="font-size:0.85rem; color:#a1a1aa;" id="song-count"></span>
-      <button class="btn-play-all" onclick="playCurrentIndex(0)">▶ Tümünü Oynat</button>
     </div>
 
     <div id="playlist" class="playlist"></div>
   </div>
 
-  <!-- Altta Kapanmayan Sabit Mini Oynatıcı -->
-  <div id="bottom-player" class="bottom-player">
-    <div class="player-top">
-      <div class="player-meta">
-        <div class="title" id="track-title">Şarkı Bekleniyor...</div>
-        <div class="artist" id="track-artist">Sanatçı</div>
-      </div>
-      <div class="player-controls">
-        <button class="ctrl-btn" onclick="playPrev()" title="Önceki">⏮</button>
-        <button class="ctrl-btn ctrl-play-pause" id="play-pause-btn" onclick="togglePlay()" title="Oynat/Durdur">⏸</button>
-        <button class="ctrl-btn" onclick="playNext()" title="Sonraki">⏭</button>
-        <button class="ctrl-btn" onclick="closePlayer()" title="Kapat" style="font-size:0.9rem; margin-left:6px;">✕</button>
-      </div>
-    </div>
-    <div class="yt-embed-box">
-      <div id="yt-player"></div>
-    </div>
-  </div>
-
-  <!-- YouTube IFrame API Scripti -->
-  <script src="https://www.youtube.com/iframe_api"></script>
-
   <script>
   const BACKEND_URL = "https://fitness-backend-opv7.onrender.com/api/generate-playlist";
-
-  let playlistQueue = [];
-  let currentIndex = -1;
-  let ytPlayer = null;
-  let isApiReady = false;
-
-  // YouTube API yüklendiğinde tetiklenir
-  function onYouTubeIframeAPIReady() {
-    isApiReady = true;
-  }
-
-  function initPlayer(query) {
-    if (!isApiReady) return;
-
-    if (!ytPlayer) {
-      ytPlayer = new YT.Player('yt-player', {
-        playerVars: {
-          'autoplay': 1,
-          'controls': 1,
-          'rel': 0,
-          'modestbranding': 1
-        },
-        events: {
-          'onReady': (event) => {
-            loadSearchQuery(query);
-          },
-          'onStateChange': onPlayerStateChange
-        }
-      });
-    } else {
-      loadSearchQuery(query);
-    }
-  }
-
-  function loadSearchQuery(query) {
-    // YouTube iframe arama kuyruğu ile parçayı çeker ve çalar
-    ytPlayer.loadPlaylist({
-      listType: 'search',
-      list: query,
-      index: 0
-    });
-  }
-
-  // Şarkı durumu değiştiğinde otomatik sonraki şarkıya geçme kuralı
-  function onPlayerStateChange(event) {
-    const playPauseBtn = document.getElementById('play-pause-btn');
-
-    // 0 = YT.PlayerState.ENDED (Şarkı bitti)
-    if (event.data === YT.PlayerState.ENDED) {
-      playNext(); // BİTTİĞİNDE OTOMATİK DİĞER ŞARKIVA GEÇ
-    } else if (event.data === YT.PlayerState.PLAYING) {
-      playPauseBtn.innerText = "⏸";
-    } else if (event.data === YT.PlayerState.PAUSED) {
-      playPauseBtn.innerText = "▶";
-    }
-  }
-
-  function togglePlay() {
-    if (!ytPlayer) return;
-    const state = ytPlayer.getPlayerState();
-    if (state === YT.PlayerState.PLAYING) {
-      ytPlayer.pauseVideo();
-    } else {
-      ytPlayer.playVideo();
-    }
-  }
-
-  function playCurrentIndex(index) {
-    if (index < 0 || index >= playlistQueue.length) return;
-    currentIndex = index;
-
-    const song = playlistQueue[currentIndex];
-    const fullQuery = `${song.artist} - ${song.title} audio`;
-
-    // Alt barı göster ve bilgileri güncelle
-    document.getElementById('bottom-player').style.display = 'flex';
-    document.getElementById('track-title').innerText = song.title;
-    document.getElementById('track-artist').innerText = song.artist;
-
-    // Aktif kart tasarımını güncelle
-    document.querySelectorAll('.song-card').forEach((el, idx) => {
-      if (idx === currentIndex) el.classList.add('active-song');
-      else el.classList.remove('active-song');
-    });
-
-    if (!ytPlayer) {
-      initPlayer(fullQuery);
-    } else {
-      loadSearchQuery(fullQuery);
-    }
-  }
-
-  function playNext() {
-    if (currentIndex + 1 < playlistQueue.length) {
-      playCurrentIndex(currentIndex + 1);
-    } else {
-      // Liste bittiğinde başa dönmek istersen:
-      playCurrentIndex(0);
-    }
-  }
-
-  function playPrev() {
-    if (currentIndex - 1 >= 0) {
-      playCurrentIndex(currentIndex - 1);
-    }
-  }
-
-  function closePlayer() {
-    if (ytPlayer && typeof ytPlayer.stopVideo === 'function') {
-      ytPlayer.stopVideo();
-    }
-    document.getElementById('bottom-player').style.display = 'none';
-  }
 
   function quickSelect(text) {
     document.getElementById('mood-input').value = text;
@@ -437,9 +228,7 @@
   }
 
   document.getElementById('mood-input').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-      generatePlaylist();
-    }
+    if (e.key === 'Enter') generatePlaylist();
   });
 
   async function generatePlaylist() {
@@ -470,14 +259,19 @@
         throw new Error(songs.error || "Şarkılar getirilemedi.");
       }
 
-      playlistQueue = songs;
-      songCount.innerText = `${songs.length} Parça Bulundu`;
+      songCount.innerText = `${songs.length} Şarkı Hazır`;
       actions.style.display = 'flex';
 
       songs.forEach((song, idx) => {
         const card = document.createElement('div');
         card.className = 'song-card';
-        card.onclick = () => playCurrentIndex(idx);
+
+        // YouTube ve Spotify arama bağlantıları
+        const ytQuery = encodeURIComponent(`${song.artist} ${song.title}`);
+        const spQuery = encodeURIComponent(`${song.artist} ${song.title}`);
+
+        const ytUrl = `https://www.youtube.com/results?search_query=${ytQuery}`;
+        const spUrl = `https://open.spotify.com/search/${spQuery}`;
 
         card.innerHTML = `
           <div class="song-info">
@@ -485,15 +279,17 @@
             <p>${song.artist}</p>
             <span>${song.vibe || ''}</span>
           </div>
-          <div class="links">
-            <button class="btn-play-song" title="Çal">▶</button>
+          <div class="action-buttons">
+            <a href="${ytUrl}" target="_blank" class="btn-play btn-yt" title="YouTube'da Dinle">
+              ▶ YouTube
+            </a>
+            <a href="${spUrl}" target="_blank" class="btn-play btn-sp" title="Spotify'da Dinle">
+              ♫ Spotify
+            </a>
           </div>
         `;
         listContainer.appendChild(card);
       });
-
-      // İsteğe bağlı: Liste gelir gelmez 1. şarkıyı anında başlatmak istersen bu satırı açabilirsin:
-      // playCurrentIndex(0);
 
     } catch (err) {
       listContainer.innerHTML = `
