@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <link rel="icon" type="image/png" href="Gemini_Generated_Image_bjczfnbjczfnbjcz (1).jpg">
+  <link rel="icon" type="image/jpeg" href="Gemini_Generated_Image_bjczfnbjczfnbjcz (1).jpg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>fitness PR</title>
@@ -170,7 +170,7 @@
       font-weight: 600;
     }
 
-    /* Topluluk & Instagram Kartı */
+    /* Topluluk & Instagram Kartı (@prfitnesspr) */
     .community-card {
       background: linear-gradient(135deg, #18120e, #141414);
       border: 1px solid var(--border-color);
@@ -229,15 +229,30 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: transform 0.2s ease, opacity 0.2s ease;
+      transition: opacity 0.2s ease;
     }
 
     .community-btn:hover {
       opacity: 0.9;
     }
 
-    .community-btn:active {
-      transform: scale(0.96);
+    /* PWA İndirme Bilgi Çubuğu */
+    .app-install-tip {
+      background-color: var(--bg-card);
+      border: 1px dashed var(--border-color);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .app-install-tip i {
+      color: var(--primary-orange);
+      font-size: 1rem;
     }
 
     /* Ön Sayfadaki Gömülü Müzik Çerçevesi */
@@ -424,7 +439,7 @@
         </div>
       </div>
 
-      <!-- Kendi Topluluğunu Büyüt: Instagram Kartı -->
+      <!-- Topluluk & Instagram Kartı (@prfitnesspr) -->
       <div class="community-card">
         <div class="community-info">
           <i class="fa-brands fa-instagram"></i>
@@ -434,10 +449,15 @@
             <div class="community-desc">Yüksek proteinli tariflerini veya antrenmanını DM'den at, hesapta öne çıkaralım.</div>
           </div>
         </div>
-        <!-- Buradaki linke kendi kullanıcı adını yaz -->
-        <a href="https://instagram.com/prfitnesspr" target="_blank" rel="noopener noreferrer" class="community-btn">
-          DM At <i class="fa-solid fa-paper-plane"></i>
-        </a>
+        <a href="https://www.instagram.com/prfitnesspr" target="_blank" rel="noopener noreferrer" class="community-btn">
+  DM At <i class="fa-solid fa-paper-plane"></i>
+</a>
+      </div>
+
+      <!-- Uygulama İndirme İpucu -->
+      <div class="app-install-tip">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+        <span>Uygulama olarak kullanmak için tarayıcı menüsünden <b>"Ana Ekrana Ekle"</b> veya <b>"Yükle"</b> deyin.</span>
       </div>
 
       <div class="home-custom-frame">
@@ -628,7 +648,7 @@
       document.getElementById('homeWaterDisplay').textContent = `${amount} ml`;
     }
 
-    // Service Worker Kaydı (PWA Kurulumu İçin)
+    // Service Worker Kaydı (PWA)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
