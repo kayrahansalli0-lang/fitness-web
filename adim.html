@@ -82,6 +82,7 @@
       color: var(--brand-orange);
       border: 1px solid var(--brand-orange);
       font-weight: 600;
+      line-height: 1.4;
     }
     
     .inputs { display: flex; gap: 10px; margin-bottom: 14px; }
@@ -161,6 +162,7 @@
       line-height: 1.6;
       color: var(--pure-white);
       display: none;
+      white-space: pre-line;
     }
     .ai-title { font-weight: 800; color: var(--brand-orange); margin-bottom: 8px; font-size: 14px; }
   </style>
@@ -171,12 +173,12 @@
 
   <div class="panel">
     <div class="search-box">
-      <input type="text" id="aramaInput" class="search-input" placeholder="Yer veya dükkan yazın (örn: BİM, Eczane, MarkAntalya)" onkeydown="if(event.key==='Enter') hedefAra()">
+      <input type="text" id="aramaInput" class="search-input" placeholder="Hedef yazın (örn: Terracity, Eczane, Park)" onkeydown="if(event.key==='Enter') hedefAra()">
       <button class="btn-search" onclick="hedefAra()">Rotayı Bul</button>
     </div>
 
     <div class="row">
-      <div class="status-badge" id="instruction">GPS konumu alınıyor...</div>
+      <div class="status-badge" id="instruction">GPS konumu aranıyor...</div>
     </div>
 
     <div class="inputs">
@@ -207,7 +209,7 @@
 
     <div class="btn-group">
       <button class="btn btn-calc" id="btnAi" onclick="aiKaloriHesapla()" disabled>⚡ Gemini ile Analiz Et</button>
-      <button class="btn btn-relocate" onclick="konumumuBul()">📍 Konumumu Yenile</button>
+      <button class="btn btn-relocate" onclick="konumumuBul()">📍 Konumu Yenile</button>
     </div>
 
     <div class="ai-result" id="aiBox">
@@ -219,7 +221,6 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    // Canlı Render backend endpoint adresi
     const BACKEND_URL = "https://fitness-backend-opv7.onrender.com/api/analyze-walk";
 
     let map;
@@ -231,6 +232,7 @@
     let hedefAdi = "";
 
     function initMap() {
+      // Varsayılan merkez Antalya
       map = L.map('map').setView([36.8841, 30.7056], 13);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -238,48 +240,62 @@
         attribution: '© OpenStreetMap'
       }).addTo(map);
 
-      map.on('click', (e) => hedefAyarla(e.latlng.lat, e.latlng.lng, "Haritada Seçilen Nokta"));
+      // Haritaya tıklanınca hedef belirleme
+      map.on('click', (e) => {
+        if (!baslangicNoktasi) {
+          // Eğer konum izni verilmediyse ilk tıklama başlangıç olsun
+          baslangicBelirle(e.latlng.lat, e.latlng.lng, "Başlangıç (Seçilen Yer)");
+          document.getElementById("instruction").innerText = "Şimdi gitmek istediğin hedefe haritadan dokun.";
+        } else {
+          hedefAyarla(e.latlng.lat, e.latlng.lng, "Haritada Seçilen Hedef");
+        }
+      });
+
       konumumuBul();
+    }
+
+    function baslangicBelirle(lat, lng, baslik) {
+      baslangicNoktasi = { lat, lng };
+
+      if (baslangicMarker) map.removeLayer(baslangicMarker);
+
+      baslangicMarker = L.circleMarker([lat, lng], {
+        radius: 9,
+        fillColor: "#fc6A03",
+        color: "#ffffff",
+        weight: 3,
+        opacity: 1,
+        fillOpacity: 1
+      }).addTo(map).bindPopup(`<b>${baslik}</b>`).openPopup();
+
+      map.setView([lat, lng], 15);
+      if (hedefMarker) rotayiYenile();
     }
 
     function konumumuBul() {
       const info = document.getElementById("instruction");
-      info.innerText = "GPS konumu alınıyor...";
+      info.innerText = "GPS konumu alınıyor (Lütfen izin verin)...";
 
       if (!navigator.geolocation) {
-        info.innerText = "Cihazınızda GPS desteği bulunamadı.";
+        info.innerText = "GPS desteği yok. Başlangıç için haritaya dokunun.";
         return;
       }
 
+      // 1. Önce hızlı yanıt için toleranslı dene
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          baslangicNoktasi = { lat, lng };
-
-          if (baslangicMarker) map.removeLayer(baslangicMarker);
-
-          baslangicMarker = L.circleMarker([lat, lng], {
-            radius: 9,
-            fillColor: "#fc6A03",
-            color: "#ffffff",
-            weight: 3,
-            opacity: 1,
-            fillOpacity: 1
-          }).addTo(map).bindPopup("<b>Buradasınız (Başlangıç)</b>").openPopup();
-
-          map.setView([lat, lng], 15);
-          info.innerText = "Yeri yazıp 'Rotayı Bul'a basın veya haritaya dokunun.";
-
-          if (hedefMarker) {
-            rotayiYenile();
-          }
+          baslangicBelirle(pos.coords.latitude, pos.coords.longitude, "Buradasınız (Başlangıç)");
+          info.innerText = "Konum bulundu! Gitmek istediğin yeri ara veya haritaya dokun.";
         },
         (err) => {
-          info.innerText = "Konum izni alınamadı, harita üzerinden devam edebilirsiniz.";
-          console.warn(err);
+          console.warn("GPS Hatası:", err);
+          info.innerText = "Konum alınamadı. Haritaya dokunarak başlangıç ve hedef seçebilirsiniz.";
+          // Kullanıcıyı kilitlememek için varsayılan bir başlangıç ver
+          if (!baslangicNoktasi) {
+            baslangicBelirle(36.8841, 30.7056, "Varsayılan Başlangıç (Antalya)");
+          }
         },
-        { enableHighAccuracy: true, timeout: 10000 }
+        { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
       );
     }
 
@@ -289,25 +305,24 @@
       if (!sorgu) return;
 
       if (!baslangicNoktasi) {
-        alert("Önce GPS konumunuzun tespit edilmesi gerekiyor.");
-        return;
+        baslangicBelirle(36.8841, 30.7056, "Antalya Merkez");
       }
 
-      info.innerText = `Size en yakın "${sorgu}" taranıyor...`;
+      info.innerText = `"${sorgu}" aranıyor...`;
 
       try {
-        const delta = 0.25;
+        const delta = 0.35;
         const minLng = baslangicNoktasi.lng - delta;
         const maxLng = baslangicNoktasi.lng + delta;
         const minLat = baslangicNoktasi.lat - delta;
         const maxLat = baslangicNoktasi.lat + delta;
 
-        let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(sorgu)}&viewbox=${minLng},${maxLat},${maxLng},${minLat}&bounded=1&limit=15`;
+        let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(sorgu)}&viewbox=${minLng},${maxLat},${maxLng},${minLat}&bounded=1&limit=10`;
         let res = await fetch(url);
         let data = await res.json();
 
         if (!data || data.length === 0) {
-          const fallbackUrl = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=tr&q=${encodeURIComponent(sorgu)}&limit=15`;
+          const fallbackUrl = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=tr&q=${encodeURIComponent(sorgu)}&limit=10`;
           res = await fetch(fallbackUrl);
           data = await res.json();
         }
@@ -328,27 +343,20 @@
           const lng = parseFloat(enYakinYer.lon);
           hedefAdi = enYakinYer.display_name.split(",")[0];
           
-          hedefAyarla(lat, lng, `En Yakın: ${hedefAdi}`);
-          info.innerText = `Size en yakın bulundu: ${hedefAdi} (${(enKisaMesafe / 1000).toFixed(2)} km)`;
+          hedefAyarla(lat, lng, `${hedefAdi}`);
+          info.innerText = `Hedef: ${hedefAdi} (${(enKisaMesafe / 1000).toFixed(2)} km)`;
         } else {
-          info.innerText = "Yakınınızda bu isimle bir yer bulunamadı.";
+          info.innerText = "Hedef bulunamadı, haritadan istediğiniz noktaya dokunun.";
         }
       } catch (err) {
-        info.innerText = "Arama servisine bağlanılamadı.";
+        info.innerText = "Arama servisine ulaşılamadı. Haritaya dokunarak seçebilirsiniz.";
       }
     }
 
     function hedefAyarla(lat, lng, baslik) {
-      if (!baslangicNoktasi) {
-        alert("Önce GPS konumunuzun gelmesini bekleyin.");
-        return;
-      }
-
       hedefAdi = baslik;
 
-      if (hedefMarker) {
-        map.removeLayer(hedefMarker);
-      }
+      if (hedefMarker) map.removeLayer(hedefMarker);
 
       hedefMarker = L.marker([lat, lng]).addTo(map)
         .bindPopup(`<b>${baslik}</b>`)
@@ -369,8 +377,8 @@
         [hedefLatLng.lat, hedefLatLng.lng]
       ];
 
-      rotaCizgisi = L.polyline(noktalar, { color: '#fc6A03', weight: 5, dashArray: '8, 8' }).addTo(map);
-      map.fitBounds(rotaCizgisi.getBounds(), { padding: [50, 50] });
+      rotaCizgisi = L.polyline(noktalar, { color: '#fc6A03', weight: 4, dashArray: '6, 8' }).addTo(map);
+      map.fitBounds(rotaCizgisi.getBounds(), { padding: [40, 40] });
 
       const mesafeMetre = map.distance([baslangicNoktasi.lat, baslangicNoktasi.lng], [hedefLatLng.lat, hedefLatLng.lng]);
       secilenMesafeKm = (mesafeMetre / 1000).toFixed(2);
@@ -382,7 +390,6 @@
       document.getElementById("btnAi").disabled = false;
     }
 
-    // Doğrudan Canlı Backend Sunucumuza İstek Atıyoruz
     async function aiKaloriHesapla() {
       if (secilenMesafeKm <= 0) return;
 
@@ -390,16 +397,18 @@
       const tempo = document.getElementById("tempoSelect").value;
       const aiBox = document.getElementById("aiBox");
       const aiText = document.getElementById("aiText");
+      const btnAi = document.getElementById("btnAi");
 
       aiBox.style.display = "block";
-      aiText.innerText = "Yapay zeka analiz ediyor...";
+      aiText.innerText = "Gemini yürüyüş rotasını ve yakılacak kaloriyi analiz ediyor...";
+      btnAi.disabled = true;
 
       try {
         const response = await fetch(BACKEND_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            hedefAdi: hedefAdi,
+            hedefAdi: hedefAdi || "Seçilen Rota",
             secilenMesafeKm: secilenMesafeKm,
             kilo: kilo,
             tempo: tempo
@@ -415,7 +424,9 @@
 
         aiText.innerText = data.text;
       } catch (err) {
-        aiText.innerText = "Ağ Hatası: " + err.message;
+        aiText.innerText = "Sunucuya bağlanılamadı. Render backend'inin açık olduğundan emin olun (" + err.message + ")";
+      } finally {
+        btnAi.disabled = false;
       }
     }
 

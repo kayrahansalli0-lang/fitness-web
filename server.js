@@ -41,14 +41,16 @@ async function getYouTubeVideoId(title, artist) {
   }
 }
 
-// 1. ENDPOINT: Kalori Tarayıcı
+// 1. ENDPOINT: Kalori Tarayıcı (kalori.html için)
 app.post('/api/analyze-food', async (req, res) => {
   try {
     const { imageBase64 } = req.body;
     if (!imageBase64) return res.status(400).json({ error: 'Görsel verisi gönderilmedi.' });
 
     const apiKey = process.env.GEMINI_API_KEY;
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+    if (!apiKey) return res.status(500).json({ error: 'Sunucuda API Key bulunamadı.' });
+
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     const payload = {
       contents: [{
@@ -75,11 +77,12 @@ app.post('/api/analyze-food', async (req, res) => {
     const data = JSON.parse(resJson.candidates[0].content.parts[0].text);
     res.json(data);
   } catch (err) {
+    console.error("Kalori Analiz Hatası:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
-// 2. ENDPOINT: AI Mood Playlist (GÜNCELLENEN KISIM)
+// 2. ENDPOINT: AI Mood Playlist (music.html için)
 app.post('/api/generate-playlist', async (req, res) => {
   try {
     const { mood } = req.body;
@@ -88,7 +91,7 @@ app.post('/api/generate-playlist', async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return res.status(500).json({ error: 'Sunucuda API Key bulunamadı.' });
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     const promptText = `Sen uzman bir müzik küratörüsün. Kullanıcının verdiği şu moda/aktiviteye göre tam 8 şarkılık bir liste hazırla: "${mood}".
 Yanıtını SADECE geçerli bir JSON formatında ver. Açıklama metni veya markdown kodu yazma.
@@ -124,7 +127,6 @@ Format:
     const cleanJson = rawText.replace(/```json/gi, "").replace(/```/g, "").trim();
     const songs = JSON.parse(cleanJson);
 
-    // YouTube araması hata verse bile şarkıların gelmesini engellemez
     const songsWithVideos = await Promise.all(
       songs.map(async (song) => {
         try {
@@ -144,18 +146,22 @@ Format:
   }
 });
 
-// 3. ENDPOINT: Yürüyüş Analizi
+// 3. ENDPOINT: Yürüyüş Analizi (adim.html için)
 app.post('/api/analyze-walk', async (req, res) => {
   try {
     const { hedefAdi, secilenMesafeKm, kilo, tempo } = req.body;
+
+    if (!secilenMesafeKm) {
+      return res.status(400).json({ error: 'Mesafe bilgisi eksik.' });
+    }
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return res.status(500).json({ error: 'Sunucuda API Key bulunamadı.' });
 
     const prompt = `Kullanıcı mevcut konumundan "${hedefAdi || 'seçilen hedefe'}" yürüyecek:
 - Haritadaki Düz Kuş Uçuşu Mesafe: ${secilenMesafeKm} km (Şehir içi sokak kıvrımlarından ötürü gerçek yürüyüş genelde bunun %20-25 fazlasıdır, hesaba kat).
-- Sporcu Ağırlığı: ${kilo} kg
-- Hedeflenen Tempo: ${tempo}
+- Sporcu Ağırlığı: ${kilo || 75} kg
+- Hedeflenen Tempo: ${tempo || 'Orta (5 km/s)'}
 
 Lütfen net ve samimi bir koç gibi yanıt ver:
 1. Gerçek sokak şartlarına göre tahmini yürüme mesafesi ve kaç dakika süreceği.
@@ -163,7 +169,7 @@ Lütfen net ve samimi bir koç gibi yanıt ver:
 3. Bu enerjinin karşılığı olan somut bir Türk mutfağı/atıştırmalık besin örneği (örn: 1 simit, yarım porsiyon döner vb.).
 4. Yürüyüş için 2 cümlelik pratik motivasyon ve hidrasyon/toparlanma önerisi.`;
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(endpoint, {
       method: "POST",
@@ -183,6 +189,7 @@ Lütfen net ve samimi bir koç gibi yanıt ver:
 
     res.json({ text: resultText });
   } catch (err) {
+    console.error("Yürüyüş Analiz Hatası:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
