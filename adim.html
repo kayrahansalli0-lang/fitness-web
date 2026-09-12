@@ -232,20 +232,18 @@
     let hedefAdi = "";
 
     function initMap() {
-      // Varsayılan merkez Antalya
-      map = L.map('map').setView([36.8841, 30.7056], 13);
+      // Haritayı dünya genelinde başlat, koordinata zorlama
+      map = L.map('map').setView([39.0, 35.0], 6);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© OpenStreetMap'
       }).addTo(map);
 
-      // Haritaya tıklanınca hedef belirleme
       map.on('click', (e) => {
         if (!baslangicNoktasi) {
-          // Eğer konum izni verilmediyse ilk tıklama başlangıç olsun
-          baslangicBelirle(e.latlng.lat, e.latlng.lng, "Başlangıç (Seçilen Yer)");
-          document.getElementById("instruction").innerText = "Şimdi gitmek istediğin hedefe haritadan dokun.";
+          baslangicBelirle(e.latlng.lat, e.latlng.lng, "Seçtiğiniz Başlangıç");
+          document.getElementById("instruction").innerText = "Başlangıç seçildi. Şimdi hedefe dokunun.";
         } else {
           hedefAyarla(e.latlng.lat, e.latlng.lng, "Haritada Seçilen Hedef");
         }
@@ -268,34 +266,40 @@
         fillOpacity: 1
       }).addTo(map).bindPopup(`<b>${baslik}</b>`).openPopup();
 
-      map.setView([lat, lng], 15);
+      map.setView([lat, lng], 16);
       if (hedefMarker) rotayiYenile();
     }
 
     function konumumuBul() {
       const info = document.getElementById("instruction");
-      info.innerText = "GPS konumu alınıyor (Lütfen izin verin)...";
+      info.innerText = "GPS aranıyor, lütfen izin verin...";
 
       if (!navigator.geolocation) {
-        info.innerText = "GPS desteği yok. Başlangıç için haritaya dokunun.";
+        info.innerText = "Cihazda GPS yok. Haritaya dokunarak başlangıç seçin.";
         return;
       }
 
-      // 1. Önce hızlı yanıt için toleranslı dene
+      // Yüksek doğruluklu gerçek telefon GPS'i
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          baslangicBelirle(pos.coords.latitude, pos.coords.longitude, "Buradasınız (Başlangıç)");
-          info.innerText = "Konum bulundu! Gitmek istediğin yeri ara veya haritaya dokun.";
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          baslangicBelirle(lat, lng, "Mevcut Konumunuz");
+          info.innerText = "Konumunuz tespit edildi! Hedef arayın veya dokunun.";
         },
         (err) => {
           console.warn("GPS Hatası:", err);
-          info.innerText = "Konum alınamadı. Haritaya dokunarak başlangıç ve hedef seçebilirsiniz.";
-          // Kullanıcıyı kilitlememek için varsayılan bir başlangıç ver
-          if (!baslangicNoktasi) {
-            baslangicBelirle(36.8841, 30.7056, "Varsayılan Başlangıç (Antalya)");
+          if (err.code === 1) {
+            info.innerText = "Konum izni reddedildi. Tarayıcı ayarlarından konuma izin verin.";
+          } else {
+            info.innerText = "GPS sinyali alınamadı. Haritadan başlangıca dokunun.";
           }
         },
-        { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+        { 
+          enableHighAccuracy: true, // Gerçek GPS çipi
+          timeout: 15000,           // 15 sn bekle
+          maximumAge: 0             // Önbellek kullanma, anlık al
+        }
       );
     }
 
@@ -305,13 +309,14 @@
       if (!sorgu) return;
 
       if (!baslangicNoktasi) {
-        baslangicBelirle(36.8841, 30.7056, "Antalya Merkez");
+        alert("Önce GPS'in gelmesini bekleyin veya haritadan başlangıç noktasına dokunun.");
+        return;
       }
 
       info.innerText = `"${sorgu}" aranıyor...`;
 
       try {
-        const delta = 0.35;
+        const delta = 0.25;
         const minLng = baslangicNoktasi.lng - delta;
         const maxLng = baslangicNoktasi.lng + delta;
         const minLat = baslangicNoktasi.lat - delta;
@@ -346,10 +351,10 @@
           hedefAyarla(lat, lng, `${hedefAdi}`);
           info.innerText = `Hedef: ${hedefAdi} (${(enKisaMesafe / 1000).toFixed(2)} km)`;
         } else {
-          info.innerText = "Hedef bulunamadı, haritadan istediğiniz noktaya dokunun.";
+          info.innerText = "Hedef bulunamadı, haritadan noktaya dokunabilirsiniz.";
         }
       } catch (err) {
-        info.innerText = "Arama servisine ulaşılamadı. Haritaya dokunarak seçebilirsiniz.";
+        info.innerText = "Arama servisine ulaşılamadı. Haritaya dokunarak seçin.";
       }
     }
 
@@ -424,7 +429,7 @@
 
         aiText.innerText = data.text;
       } catch (err) {
-        aiText.innerText = "Sunucuya bağlanılamadı. Render backend'inin açık olduğundan emin olun (" + err.message + ")";
+        aiText.innerText = "Sunucuya bağlanılamadı. (" + err.message + ")";
       } finally {
         btnAi.disabled = false;
       }
