@@ -385,13 +385,13 @@
     }
 
     .nav-item i {
-      font-size: 18px;
+      font-size: 17px;
       margin-bottom: 4px;
       transition: transform 0.2s ease;
     }
 
     .nav-item span {
-      font-size: 9px;
+      font-size: 8.5px;
       font-weight: 600;
       letter-spacing: 0.2px;
     }
@@ -450,8 +450,8 @@
           </div>
         </div>
         <a href="https://www.instagram.com/prfitnesspr" target="_blank" rel="noopener noreferrer" class="community-btn">
-  DM At <i class="fa-solid fa-paper-plane"></i>
-</a>
+          DM At <i class="fa-solid fa-paper-plane"></i>
+        </a>
       </div>
 
       <!-- Uygulama İndirme İpucu -->
@@ -465,31 +465,37 @@
       </div>
     </div>
     
-    <!-- 2. ADIM SAYFASI (index.html içinde) -->
-<div id="adim-page" class="tab-content" style="padding: 0;">
-  <iframe src="adim.html" loading="lazy" allow="geolocation" style="width: 100%; height: 100%; border: none;"></iframe>
-</div>
-    <!-- 3. PLAYLIST SAYFASI -->
+    <!-- 2. TAKVİM SAYFASI -->
+    <div id="takvim-page" class="tab-content" style="padding: 0;">
+      <iframe src="takvim.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+
+    <!-- 3. ADIM SAYFASI -->
+    <div id="adim-page" class="tab-content" style="padding: 0;">
+      <iframe src="adim.html" loading="lazy" allow="geolocation" style="width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+
+    <!-- 4. PLAYLIST SAYFASI -->
     <div id="music-page" class="tab-content" style="padding: 0;">
       <iframe src="music.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
-    <!-- 4. KALORİ SAYFASI -->
+    <!-- 5. KALORİ SAYFASI -->
     <div id="kalori-page" class="tab-content" style="padding: 0;">
       <iframe src="kalori.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
-    <!-- 5. ANTRENMAN SAYFASI -->
+    <!-- 6. ANTRENMAN SAYFASI -->
     <div id="antrenman-page" class="tab-content" style="padding: 0;">
       <iframe src="antrenman.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
-    <!-- 6. DİNLENME SAYFASI -->
+    <!-- 7. DİNLENME SAYFASI -->
     <div id="dinlenme-page" class="tab-content" style="padding: 0;">
       <iframe src="dinlenme.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
-    <!-- 7. SU SAYFASI -->
+    <!-- 8. SU SAYFASI -->
     <div id="su-page" class="tab-content">
       <div class="water-container">
         <div class="water-card">
@@ -520,6 +526,11 @@
     <div class="nav-item active" data-target="home-page">
       <i class="fa-solid fa-house"></i>
       <span>Ön Sayfa</span>
+    </div>
+
+    <div class="nav-item" data-target="takvim-page">
+      <i class="fa-solid fa-calendar-days"></i>
+      <span>Takvim</span>
     </div>
 
     <div class="nav-item" data-target="adim-page">
