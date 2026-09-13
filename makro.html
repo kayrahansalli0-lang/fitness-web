@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Makro & Beslenme Asistanı</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary-orange: #ff6b00;
+      --accent-orange: #ff8800;
+      --bg-main: #0a0a0a;
+      --bg-card: #141414;
+      --border-color: #262626;
+      --text-main: #f5f5f5;
+      --text-muted: #8a8a8a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      padding: 16px;
+      padding-bottom: 40px;
+    }
+
+    .header-box {
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .header-box h1 {
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    .header-box h1 span { color: var(--primary-orange); }
+    .header-box p { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* Form Giriş Alanları */
+    .calc-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input, select {
+      width: 100%;
+      background: #0d0d0d;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary-orange);
+    }
+
+    /* Hedef Seçim Butonları */
+    .goal-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .goal-btn {
+      background: #0d0d0d;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 10px 4px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .goal-btn.active {
+      background: rgba(255, 107, 0, 0.15);
+      border-color: var(--primary-orange);
+      color: var(--primary-orange);
+    }
+
+    .btn-calc {
+      width: 100%;
+      background: var(--primary-orange);
+      color: #000;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* Makro Sonuç Kartları */
+    .results-section {
+      display: none;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .total-cal-box {
+      background: linear-gradient(135deg, #1f140e, var(--bg-card));
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--primary-orange);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .total-cal-val {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--primary-orange);
+    }
+
+    .macros-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .macro-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .macro-val {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .macro-lbl {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* Asistan Öğün Kartları */
+    .meals-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .meals-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--primary-orange);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .meal-item {
+      background: #0d0d0d;
+      border: 1px solid #1f1f1f;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+
+    .meal-name {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .meal-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-box">
+    <h1>MAKRO & BESLENME <span>SİHİRBAZI</span></h1>
+    <p>Hedefine göre net kalori, makro dağılımı ve günlük beslenme stratejisi.</p>
+  </div>
+
+  <div class="calc-card">
+    <div class="grid-2">
+      <div>
+        <label>Cinsiyet</label>
+        <select id="gender">
+          <option value="male">Erkek</option>
+          <option value="female">Kadın</option>
+        </select>
+      </div>
+      <div>
+        <label>Yaş</label>
+        <input type="number" id="age" value="22">
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <label>Boy (cm)</label>
+        <input type="number" id="height" value="178">
+      </div>
+      <div>
+        <label>Kilo (kg)</label>
+        <input type="number" id="weight" value="75">
+      </div>
+    </div>
+
+    <label>Haftalık Aktivite Seviyesi</label>
+    <select id="activity" style="margin-bottom: 10px;">
+      <option value="1.2">Masa Başı / Hareketsiz</option>
+      <option value="1.375">Hafif Hareketli (Haftada 1-2 gün spor)</option>
+      <option value="1.55" selected>Orta Hareketli (Haftada 3-5 gün ağırlık)</option>
+      <option value="1.725">Çok Aktif (Haftada 6-7 gün ağır idman)</option>
+    </select>
+
+    <label>Hedefin Nedir?</label>
+    <div class="goal-selector">
+      <div class="goal-btn active" data-goal="cut" onclick="setGoal('cut', this)">
+        <i class="fa-solid fa-fire"></i><br>Definasyon
+      </div>
+      <div class="goal-btn" data-goal="maintain" onclick="setGoal('maintain', this)">
+        <i class="fa-solid fa-scale-balanced"></i><br>Koruma
+      </div>
+      <div class="goal-btn" data-goal="bulk" onclick="setGoal('bulk', this)">
+        <i class="fa-solid fa-dumbbell"></i><br>Clean Bulk
+      </div>
+    </div>
+
+    <button class="btn-calc" onclick="calculatePlan()">
+      <i class="fa-solid fa-wand-magic-sparkles"></i> Planı & Öğünleri Çıkar
+    </button>
+  </div>
+
+  <!-- Sonuçlar ve Asistan Bölümü -->
+  <div class="results-section" id="resultsSection">
+    
+    <div class="total-cal-box">
+      <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Günlük Hedef Kalorin</div>
+      <div class="total-cal-val" id="resCalories">0</div>
+      <div style="font-size: 0.75rem; color: #fff; font-weight: 600;" id="resGoalText">Definasyon Kalorisi</div>
+    </div>
+
+    <div class="macros-grid">
+      <div class="macro-box">
+        <div class="macro-val" id="resProtein" style="color: #00E676;">0g</div>
+        <div class="macro-lbl">Protein</div>
+      </div>
+      <div class="macro-box">
+        <div class="macro-val" id="resCarbs" style="color: #00E5FF;">0g</div>
+        <div class="macro-lbl">Karbonhidrat</div>
+      </div>
+      <div class="macro-box">
+        <div class="macro-val" id="resFats" style="color: #FFD600;">0g</div>
+        <div class="macro-lbl">Sağlıklı Yağ</div>
+      </div>
+    </div>
+
+    <!-- Otomatik Öğün Önerisi -->
+    <div class="meals-container">
+      <div class="meals-title">
+        <i class="fa-solid fa-utensils"></i> Asistanın Günlük Menü Önerisi
+      </div>
+      <div id="mealsList"></div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentGoal = 'cut';
+
+    function setGoal(goal, element) {
+      currentGoal = goal;
+      document.querySelectorAll('.goal-btn').forEach(btn => btn.classList.remove('active'));
+      element.classList.add('active');
+    }
+
+    function calculatePlan() {
+      const gender = document.getElementById('gender').value;
+      const age = parseFloat(document.getElementById('age').value) || 22;
+      const height = parseFloat(document.getElementById('height').value) || 178;
+      const weight = parseFloat(document.getElementById('weight').value) || 75;
+      const activity = parseFloat(document.getElementById('activity').value) || 1.55;
+
+      // 1. Mifflin-St Jeor Formülü ile BMR Hesabı
+      let bmr = (10 * weight) + (6.25 * height) - (5 * age);
+      bmr = (gender === 'male') ? bmr + 5 : bmr - 161;
+
+      // 2. Günlük Harcanan Enerji (TDEE)
+      const tdee = bmr * activity;
+
+      // 3. Hedefe Göre Kalori ve Makro Dağılımı
+      let targetCalories = 0;
+      let proteinGrams = 0;
+      let fatGrams = 0;
+      let carbGrams = 0;
+      let goalText = "";
+
+      if (currentGoal === 'cut') {
+        targetCalories = Math.round(tdee - 450); // 450 kcal açık
+        proteinGrams = Math.round(weight * 2.2); // Yüksek protein (kas kaybını önlemek için)
+        fatGrams = Math.round(weight * 0.8);     // Hormonal denge için yeterli yağ
+        goalText = "Definasyon (Yağ Yakımı)";
+      } else if (currentGoal === 'bulk') {
+        targetCalories = Math.round(tdee + 350); // 350 kcal temiz fazlalık
+        proteinGrams = Math.round(weight * 2.0); // Büyüme proteini
+        fatGrams = Math.round(weight * 0.9);
+        goalText = "Clean Bulk (Temiz Kas Kazanımı)";
+      } else {
+        targetCalories = Math.round(tdee);
+        proteinGrams = Math.round(weight * 2.0);
+        fatGrams = Math.round(weight * 0.85);
+        goalText = "Kilo Koruma & Recomp";
+      }
+
+      // Kalan kalorileri karbonhidrata çevir (1g Karb = 4 kcal, 1g Protein = 4 kcal, 1g Yağ = 9 kcal)
+      const usedCalories = (proteinGrams * 4) + (fatGrams * 9);
+      carbGrams = Math.max(0, Math.round((targetCalories - usedCalories) / 4));
+
+      // Arayüzü Güncelle
+      document.getElementById('resCalories').innerText = targetCalories;
+      document.getElementById('resProtein').innerText = proteinGrams + "g";
+      document.getElementById('resCarbs').innerText = carbGrams + "g";
+      document.getElementById('resFats').innerText = fatGrams + "g";
+      document.getElementById('resGoalText').innerText = goalText;
+
+      generateSmartMeals(currentGoal, proteinGrams, carbGrams, fatGrams);
+      document.getElementById('resultsSection').style.display = 'block';
+    }
+
+    function generateSmartMeals(goal, p, c, f) {
+      const listEl = document.getElementById('mealsList');
+      listEl.innerHTML = '';
+
+      let meals = [];
+
+      if (goal === 'cut') {
+        meals = [
+          {
+            name: "1. Öğün: Tok Tutan Yüksek Protein Kahvaltı",
+            desc: `3 tam yumurta + 2 yumurta beyazı (omlet), 50g yulaf ezmesi, bol yeşillik ve salatalık, 5-6 adet zeytin.`
+          },
+          {
+            name: "2. Öğün (İdman Öncesi): Enerji & Güç",
+            desc: `180g ızgara tavuk göğsü veya hindi, 150g haşlanmış basmati pirinç veya karabuğday, 1 kase brokoli/yeşil salata.`
+          },
+          {
+            name: "3. Öğün (Akşam): Kas Onarımı & İkame",
+            desc: `180g yağsız dana kıyma veya ızgara balık, büyük boy az yağlı mevsim salatası, 1 tatlı kaşığı zeytinyağı.`
+          },
+          {
+            name: "4. Ara Öğün / Gece: Gece Boyu Anti-Katabolik",
+            desc: `150g yağsız süzme yoğurt veya lor peyniri, 1 avuç çiğ badem (15-20g). Bol su.`
+          }
+        ];
+      } else if (goal === 'bulk') {
+        meals = [
+          {
+            name: "1. Öğün: Yüksek Kalorili Başlangıç",
+            desc: `4 tam yumurta, 90g yulaf ezmesi + 1 muz + 1 tatlı kaşığı fıstık ezmesi (shake veya lapa), 1 dilim tam buğday ekmeği.`
+          },
+          {
+            name: "2. Öğün: İdman Öncesi Karbonhidrat Yüklemesi",
+            desc: `200g tavuk göğsü, 250g haşlanmış pirinç veya makarna, 1 kase yoğurt.`
+          },
+          {
+            name: "3. Öğün (İdman Sonrası): Hızlı Toparlanma",
+            desc: `200g ızgara köfte veya dana eti, 250g fırın patates veya pirinç, zeytinyağlı mevsim salatası.`
+          },
+          {
+            name: "4. Gece Öğünü: Temiz Kalori Tamamlayıcı",
+            desc: `200g süzme peynir/yoğurt, 30g ceviz/fındık, 1 adet elma veya meyve.`
+          }
+        ];
+      } else {
+        meals = [
+          {
+            name: "1. Öğün: Standart Dengeli Kahvaltı",
+            desc: `3 tam yumurta, 60g yulaf, 1 dilim beyaz peynir, domates & yeşillik.`
+          },
+          {
+            name: "2. Öğün: Günlük İtiş Gücü",
+            desc: `180g tavuk/et, 200g bulgur veya pirinç, 1 kase yoğurt.`
+          },
+          {
+            name: "3. Öğün: Hafif ve Besleyici Kapanış",
+            desc: `180g balık veya hindi göğsü, fırın sebzeler, 1 porsiyon yeşil mercimek veya salata.`
+          }
+        ];
+      }
+
+      meals.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'meal-item';
+        div.innerHTML = `
+          <div class="meal-name">
+            <span>${m.name}</span>
+          </div>
+          <div class="meal-desc">${m.desc}</div>
+        `;
+        listEl.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>
