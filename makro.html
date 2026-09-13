@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Makro & Beslenme Asistanı</title>
+  <title>Makro & Bütçe Dostu Beslenme Asistanı</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
@@ -15,6 +15,7 @@
       --border-color: #262626;
       --text-main: #f5f5f5;
       --text-muted: #8a8a8a;
+      --green-budget: #00e676;
     }
 
     * {
@@ -46,7 +47,6 @@
     .header-box h1 span { color: var(--primary-orange); }
     .header-box p { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 
-    /* Form Giriş Alanları */
     .calc-card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -86,12 +86,12 @@
       border-color: var(--primary-orange);
     }
 
-    /* Hedef Seçim Butonları */
+    /* Hedef Seçici */
     .goal-selector {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 8px;
-      margin: 12px 0;
+      margin: 10px 0 14px 0;
     }
 
     .goal-btn {
@@ -113,12 +113,42 @@
       color: var(--primary-orange);
     }
 
+    /* Bütçe / Menü Tipi Seçici */
+    .budget-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .budget-btn {
+      background: #0d0d0d;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .budget-btn.active {
+      background: rgba(0, 230, 118, 0.12);
+      border-color: var(--green-budget);
+      color: var(--green-budget);
+    }
+
     .btn-calc {
       width: 100%;
       background: var(--primary-orange);
       color: #000;
       border: none;
-      padding: 12px;
+      padding: 13px;
       border-radius: 10px;
       font-weight: 800;
       font-size: 0.9rem;
@@ -130,7 +160,7 @@
       gap: 6px;
     }
 
-    /* Makro Sonuç Kartları */
+    /* Sonuçlar */
     .results-section {
       display: none;
       animation: fadeIn 0.3s ease-in;
@@ -185,12 +215,19 @@
       margin-top: 2px;
     }
 
-    /* Asistan Öğün Kartları */
+    /* Öğün Listesi */
     .meals-container {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 14px;
       padding: 16px;
+    }
+
+    .meals-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
     }
 
     .meals-title {
@@ -200,30 +237,46 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 12px;
+    }
+
+    .badge-budget {
+      background: rgba(0, 230, 118, 0.15);
+      color: var(--green-budget);
+      border: 1px solid var(--green-budget);
+      font-size: 0.68rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 800;
     }
 
     .meal-item {
       background: #0d0d0d;
       border: 1px solid #1f1f1f;
       border-radius: 8px;
-      padding: 10px 12px;
+      padding: 12px;
       margin-bottom: 8px;
     }
 
     .meal-name {
-      font-size: 0.75rem;
-      font-weight: 700;
+      font-size: 0.78rem;
+      font-weight: 800;
       color: #fff;
       display: flex;
       justify-content: space-between;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .meal-desc {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      line-height: 1.4;
+      font-size: 0.74rem;
+      color: #ccc;
+      line-height: 1.45;
+    }
+
+    .pro-tip {
+      font-size: 0.7rem;
+      color: var(--primary-orange);
+      margin-top: 6px;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -231,7 +284,7 @@
 
   <div class="header-box">
     <h1>MAKRO & BESLENME <span>SİHİRBAZI</span></h1>
-    <p>Hedefine göre net kalori, makro dağılımı ve günlük beslenme stratejisi.</p>
+    <p>Bütçene ve hedefine göre net kalori, protein ve market menüsü.</p>
   </div>
 
   <div class="calc-card">
@@ -261,7 +314,7 @@
     </div>
 
     <label>Haftalık Aktivite Seviyesi</label>
-    <select id="activity" style="margin-bottom: 10px;">
+    <select id="activity" style="margin-bottom: 12px;">
       <option value="1.2">Masa Başı / Hareketsiz</option>
       <option value="1.375">Hafif Hareketli (Haftada 1-2 gün spor)</option>
       <option value="1.55" selected>Orta Hareketli (Haftada 3-5 gün ağırlık)</option>
@@ -281,19 +334,34 @@
       </div>
     </div>
 
+    <!-- Menü Bütçe Tercihi -->
+    <label>Menü Stratejisi</label>
+    <div class="budget-selector">
+      <div class="budget-btn active" data-budget="student" onclick="setBudget('student', this)">
+        <i class="fa-solid fa-wallet"></i> Bütçe Dostu (Öğrenci)
+      </div>
+      <div class="budget-btn" data-budget="standard" onclick="setBudget('standard', this)">
+        <i class="fa-solid fa-drumstick-bite"></i> Standart Menü
+      </div>
+    </div>
+
     <button class="btn-calc" onclick="calculatePlan()">
       <i class="fa-solid fa-wand-magic-sparkles"></i> Planı & Öğünleri Çıkar
     </button>
   </div>
 
-  <!-- Sonuçlar ve Asistan Bölümü -->
+  <!-- Sonuç Alanı -->
   <div class="results-section" id="resultsSection">
     
     <div class="total-cal-box">
-      <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Günlük Hedef Kalorin</div>
-      <div class="total-cal-val" id="resCalories">0</div>
-      <div style="font-size: 0.75rem; color: #fff; font-weight: 600;" id="resGoalText">Definasyon Kalorisi</div>
-    </div>
+  <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Günlük Hedef Kalorin</div>
+  <div class="total-cal-val" id="resCalories">0</div>
+  <div style="font-size: 0.75rem; color: #fff; font-weight: 600; margin-bottom: 10px;" id="resGoalText">Definasyon Kalorisi</div>
+  
+  <button onclick="saveTargetToDashboard()" id="btnSaveTarget" style="background: rgba(255, 107, 0, 0.15); border: 1px solid var(--primary-orange); color: var(--primary-orange); padding: 8px 16px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+    <i class="fa-solid fa-bookmark"></i> Ana Sayfa Hedefine Eşitle
+  </button>
+</div>
 
     <div class="macros-grid">
       <div class="macro-box">
@@ -310,10 +378,13 @@
       </div>
     </div>
 
-    <!-- Otomatik Öğün Önerisi -->
+    <!-- Dinamik Menü -->
     <div class="meals-container">
-      <div class="meals-title">
-        <i class="fa-solid fa-utensils"></i> Asistanın Günlük Menü Önerisi
+      <div class="meals-header">
+        <div class="meals-title">
+          <i class="fa-solid fa-utensils"></i> Günlük Beslenme Planı
+        </div>
+        <div id="budgetBadge" class="badge-budget">Bütçe Dostu</div>
       </div>
       <div id="mealsList"></div>
     </div>
@@ -322,10 +393,17 @@
 
   <script>
     let currentGoal = 'cut';
+    let currentBudget = 'student';
 
     function setGoal(goal, element) {
       currentGoal = goal;
       document.querySelectorAll('.goal-btn').forEach(btn => btn.classList.remove('active'));
+      element.classList.add('active');
+    }
+
+    function setBudget(budget, element) {
+      currentBudget = budget;
+      document.querySelectorAll('.budget-btn').forEach(btn => btn.classList.remove('active'));
       element.classList.add('active');
     }
 
@@ -336,14 +414,14 @@
       const weight = parseFloat(document.getElementById('weight').value) || 75;
       const activity = parseFloat(document.getElementById('activity').value) || 1.55;
 
-      // 1. Mifflin-St Jeor Formülü ile BMR Hesabı
+      // 1. Mifflin-St Jeor Formülü ile BMR
       let bmr = (10 * weight) + (6.25 * height) - (5 * age);
       bmr = (gender === 'male') ? bmr + 5 : bmr - 161;
 
-      // 2. Günlük Harcanan Enerji (TDEE)
+      // 2. Günlük Toplam Harcama (TDEE)
       const tdee = bmr * activity;
 
-      // 3. Hedefe Göre Kalori ve Makro Dağılımı
+      // 3. Hedefe Göre Makrolar
       let targetCalories = 0;
       let proteinGrams = 0;
       let fatGrams = 0;
@@ -351,15 +429,15 @@
       let goalText = "";
 
       if (currentGoal === 'cut') {
-        targetCalories = Math.round(tdee - 450); // 450 kcal açık
-        proteinGrams = Math.round(weight * 2.2); // Yüksek protein (kas kaybını önlemek için)
-        fatGrams = Math.round(weight * 0.8);     // Hormonal denge için yeterli yağ
+        targetCalories = Math.round(tdee - 450);
+        proteinGrams = Math.round(weight * 2.2);
+        fatGrams = Math.round(weight * 0.8);
         goalText = "Definasyon (Yağ Yakımı)";
       } else if (currentGoal === 'bulk') {
-        targetCalories = Math.round(tdee + 350); // 350 kcal temiz fazlalık
-        proteinGrams = Math.round(weight * 2.0); // Büyüme proteini
+        targetCalories = Math.round(tdee + 350);
+        proteinGrams = Math.round(weight * 2.0);
         fatGrams = Math.round(weight * 0.9);
-        goalText = "Clean Bulk (Temiz Kas Kazanımı)";
+        goalText = "Clean Bulk (Kas Kazanımı)";
       } else {
         targetCalories = Math.round(tdee);
         proteinGrams = Math.round(weight * 2.0);
@@ -367,80 +445,157 @@
         goalText = "Kilo Koruma & Recomp";
       }
 
-      // Kalan kalorileri karbonhidrata çevir (1g Karb = 4 kcal, 1g Protein = 4 kcal, 1g Yağ = 9 kcal)
+      // Kalan kalorileri karbonhidrata çevir
       const usedCalories = (proteinGrams * 4) + (fatGrams * 9);
       carbGrams = Math.max(0, Math.round((targetCalories - usedCalories) / 4));
 
-      // Arayüzü Güncelle
+      // UI Güncelle
       document.getElementById('resCalories').innerText = targetCalories;
       document.getElementById('resProtein').innerText = proteinGrams + "g";
       document.getElementById('resCarbs').innerText = carbGrams + "g";
       document.getElementById('resFats').innerText = fatGrams + "g";
       document.getElementById('resGoalText').innerText = goalText;
 
-      generateSmartMeals(currentGoal, proteinGrams, carbGrams, fatGrams);
+      const badge = document.getElementById('budgetBadge');
+      if (currentBudget === 'student') {
+        badge.innerText = "Öğrenci / Bütçe Dostu";
+        badge.style.display = "block";
+      } else {
+        badge.innerText = "Standart Menü";
+        badge.style.borderColor = "var(--border-color)";
+        badge.style.color = "#aaa";
+        badge.style.background = "#222";
+      }
+
+      renderMeals(currentGoal, currentBudget);
       document.getElementById('resultsSection').style.display = 'block';
     }
 
-    function generateSmartMeals(goal, p, c, f) {
+    function renderMeals(goal, budget) {
       const listEl = document.getElementById('mealsList');
       listEl.innerHTML = '';
-
       let meals = [];
 
-      if (goal === 'cut') {
-        meals = [
-          {
-            name: "1. Öğün: Tok Tutan Yüksek Protein Kahvaltı",
-            desc: `3 tam yumurta + 2 yumurta beyazı (omlet), 50g yulaf ezmesi, bol yeşillik ve salatalık, 5-6 adet zeytin.`
-          },
-          {
-            name: "2. Öğün (İdman Öncesi): Enerji & Güç",
-            desc: `180g ızgara tavuk göğsü veya hindi, 150g haşlanmış basmati pirinç veya karabuğday, 1 kase brokoli/yeşil salata.`
-          },
-          {
-            name: "3. Öğün (Akşam): Kas Onarımı & İkame",
-            desc: `180g yağsız dana kıyma veya ızgara balık, büyük boy az yağlı mevsim salatası, 1 tatlı kaşığı zeytinyağı.`
-          },
-          {
-            name: "4. Ara Öğün / Gece: Gece Boyu Anti-Katabolik",
-            desc: `150g yağsız süzme yoğurt veya lor peyniri, 1 avuç çiğ badem (15-20g). Bol su.`
-          }
-        ];
-      } else if (goal === 'bulk') {
-        meals = [
-          {
-            name: "1. Öğün: Yüksek Kalorili Başlangıç",
-            desc: `4 tam yumurta, 90g yulaf ezmesi + 1 muz + 1 tatlı kaşığı fıstık ezmesi (shake veya lapa), 1 dilim tam buğday ekmeği.`
-          },
-          {
-            name: "2. Öğün: İdman Öncesi Karbonhidrat Yüklemesi",
-            desc: `200g tavuk göğsü, 250g haşlanmış pirinç veya makarna, 1 kase yoğurt.`
-          },
-          {
-            name: "3. Öğün (İdman Sonrası): Hızlı Toparlanma",
-            desc: `200g ızgara köfte veya dana eti, 250g fırın patates veya pirinç, zeytinyağlı mevsim salatası.`
-          },
-          {
-            name: "4. Gece Öğünü: Temiz Kalori Tamamlayıcı",
-            desc: `200g süzme peynir/yoğurt, 30g ceviz/fındık, 1 adet elma veya meyve.`
-          }
-        ];
+      if (budget === 'student') {
+        // --- BÜTÇE DOSTU / ÖĞRENCİ MENÜSÜ ---
+        if (goal === 'cut') {
+          meals = [
+            {
+              name: "1. Öğün: Yumurta & Lor Bombası (Kahvaltı)",
+              desc: "4 adet haşlanmış yumurta (2 sarısı çıkarılabilir), 100g böreklik/tatlı lor peyniri, 50g yulaf ezmesi (suyla veya çayla lapa), bol maydanoz & salatalık.",
+              tip: "💡 İpucu: Lor peynirinin 100 gramında yaklaşık 17-19g saf protein bulunur, fiyat/protein oranı en yüksek besindir."
+            },
+            {
+              name: "2. Öğün: Yeşil Mercimek & Bulgur Gücü (Öğle / İdman Öncesi)",
+              desc: "1 büyük tabak haşlanmış yeşil mercimek yemeği (yaklaşık 100g kuru ağırlık), 4-5 yemek kaşığı pilavlık bulgur, 1 kase yoğurt.",
+              tip: "💡 İpucu: Mercimek + bulgur birlikte tüketildiğinde eksik aminoasitler birbirini tamamlar ve tam protein profili oluşturur."
+            },
+            {
+              name: "3. Öğün: Tavuk Ciğeri veya Tavuk Göğsü (Akşam)",
+              desc: "200g tavuk ciğeri veya tavuk göğsü (tavuk ciğeri yarı yarıya daha ucuzdur ve B12/demir zenginidir), bol soğanlı mevsim salatası, 1 tatlı kaşığı zeytinyağı veya ayçiçek.",
+              tip: "💡 Alternatif: Ciğer sevmiyorsan marketten dondurulmuş veya bütün tavuk alıp göğsünü haşlayabilirsin."
+            },
+            {
+              name: "4. Kapanış: Kazein Etkili Lor & Fıstık (Gece)",
+              desc: "100g lor peyniri (içine biraz tarçın atıp karıştırabilirsin), 1 avuç kavrulmamış yer fıstığı (20g).",
+              tip: "💡 Yer fıstığı badem ve cevize kıyasla 3 kat daha ucuzdur ve sağlıklı yağ ihtiyacını karşılar."
+            }
+          ];
+        } else if (goal === 'bulk') {
+          meals = [
+            {
+              name: "1. Öğün: Kalori Canavarı Yulaf Lapası",
+              desc: "4 tam yumurta (omlet), 90g yulaf ezmesi + 1 adet muz + 2 tatlı kaşığı yer fıstığı ezmesi + 1 tatlı kaşığı bal/pekmez.",
+              tip: "💡 Karbonhidrat ve sağlıklı yağ ile sabah depolarını fulle."
+            },
+            {
+              name: "2. Öğün: Kuru Fasulye / Nohut & Pirinç (Öğle)",
+              desc: "1.5 porsiyon zeytinyağlı kuru fasulye veya nohut, tepeleme 1 tabak pirinç pilavı veya makarna (250g pişmiş), 1 büyük kase tam yağlı yoğurt.",
+              tip: "💡 Kuru baklagiller ucuz hacim (bulk) döneminin en sağlam yakıtıdır."
+            },
+            {
+              name: "3. Öğün: Tavuk & Makarna Yüklemesi (Akşam)",
+              desc: "200g tavuk göğsü veya tavuk kıyması, 250g haşlanmış makarna (üzerine 50g lor peyniri serpiştirilmiş), mevsim salatası.",
+              tip: "💡 Tavuk kıymasından soslu makarna yaparak yemesi çok daha kolay bir bulk öğünü elde edersin."
+            },
+            {
+              name: "4. Gece: Yüksek Proteinli Shake",
+              desc: "1 bardak süt, 100g lor peyniri, 1 adet muz, 1 kaşık fıstık ezmesi (blender'dan geçir).",
+              tip: "💡 Çiğnemeden 30g proteini 2 dakikada mideye indirmenin en ekonomik yolu."
+            }
+          ];
+        } else {
+          meals = [
+            {
+              name: "1. Öğün: Ekonomik Dengeli Kahvaltı",
+              desc: "3 tam yumurta, 75g lor peyniri, 60g yulaf ezmesi, domates & yeşillik, 1 dilim ekmek."
+            },
+            {
+              name: "2. Öğün: Bakliyat & Karbonhidrat Dengesi",
+              desc: "1 tabak yeşil mercimek veya nohut yemeği, 1 tabak bulgur pilavı, 1 kase yoğurt."
+            },
+            {
+              name: "3. Öğün: Proteinli Akşam Yemeği",
+              desc: "180g tavuk göğsü veya tavuk ciğeri, haşlanmış patates veya makarna, mevsim yeşillikleri."
+            }
+          ];
+        }
       } else {
-        meals = [
-          {
-            name: "1. Öğün: Standart Dengeli Kahvaltı",
-            desc: `3 tam yumurta, 60g yulaf, 1 dilim beyaz peynir, domates & yeşillik.`
-          },
-          {
-            name: "2. Öğün: Günlük İtiş Gücü",
-            desc: `180g tavuk/et, 200g bulgur veya pirinç, 1 kase yoğurt.`
-          },
-          {
-            name: "3. Öğün: Hafif ve Besleyici Kapanış",
-            desc: `180g balık veya hindi göğsü, fırın sebzeler, 1 porsiyon yeşil mercimek veya salata.`
-          }
-        ];
+        // --- STANDART MENÜ (Tavuk, Kırmızı Et, Balık) ---
+        if (goal === 'cut') {
+          meals = [
+            {
+              name: "1. Öğün: Tok Tutan Yüksek Protein Kahvaltı",
+              desc: "3 tam yumurta + 2 yumurta beyazı (omlet), 50g yulaf ezmesi, bol yeşillik ve salatalık, 5-6 adet zeytin."
+            },
+            {
+              name: "2. Öğün: İdman Öncesi Enerji",
+              desc: "180g ızgara tavuk göğsü veya hindi, 150g basmati pirinç veya karabuğday, haşlanmış brokoli."
+            },
+            {
+              name: "3. Öğün: Akşam Toparlanması",
+              desc: "180g yağsız dana bonfile / antrikot veya ızgara balık, büyük boy mevsim salatası, 1 tatlı kaşığı sızma zeytinyağı."
+            },
+            {
+              name: "4. Gece: Süzme Yoğurt & Badem",
+              desc: "150g yağsız süzme yoğurt, 15-20g çiğ badem."
+            }
+          ];
+        } else if (goal === 'bulk') {
+          meals = [
+            {
+              name: "1. Öğün: Güçlü Başlangıç",
+              desc: "4 tam yumurta, 90g yulaf ezmesi, 1 muz, 30g fındık/ceviz, 1 dilim tam buğday ekmeği."
+            },
+            {
+              name: "2. Öğün: İdman Öncesi Hacim",
+              desc: "200g ızgara tavuk göğsü, 250g basmati pirinç veya makarna, 1 kase yoğurt."
+            },
+            {
+              name: "3. Öğün: Kırmızı Et & Karbonhidrat",
+              desc: "200g ızgara dana köfte veya biftek, 250g fırın patates, zeytinyağlı salata."
+            },
+            {
+              name: "4. Gece: Kapanış",
+              desc: "200g süzme peynir, 1 yeşil elma, 20g ceviz içi."
+            }
+          ];
+        } else {
+          meals = [
+            {
+              name: "1. Öğün: Dengeli Kahvaltı",
+              desc: "3 tam yumurta, 60g yulaf, 1 dilim beyaz peynir, yeşillikler."
+            },
+            {
+              name: "2. Öğün: Öğle Enerjisi",
+              desc: "180g hindi veya tavuk göğsü, 200g pirinç/bulgur, 1 kase yoğurt."
+            },
+            {
+              name: "3. Öğün: Akşam",
+              desc: "180g ızgara somon veya dana eti, fırınlanmış sebzeler ve mevsim salatası."
+            }
+          ];
+        }
       }
 
       meals.forEach(m => {
@@ -451,6 +606,7 @@
             <span>${m.name}</span>
           </div>
           <div class="meal-desc">${m.desc}</div>
+          ${m.tip ? `<div class="pro-tip">${m.tip}</div>` : ''}
         `;
         listEl.appendChild(div);
       });

@@ -145,6 +145,7 @@
       flex-direction: column;
       gap: 6px;
       transition: 0.2s ease;
+      cursor: pointer;
     }
 
     .stat-card:hover {
@@ -426,13 +427,14 @@
         <p class="quote-text" id="dailyQuote">Yükleniyor...</p>
       </div>
 
+      <!-- İstatistikler: Yakılan Kalori Yerine Hedef Kalori -->
       <div class="quick-stats-grid">
-        <div class="stat-card">
+        <div class="stat-card" onclick="switchToTab('makro-page')">
           <i class="fa-solid fa-fire"></i>
-          <span class="stat-val">0 kcal</span>
-          <span class="stat-label">Yakılan Kalori</span>
+          <span class="stat-val" id="homeCalorieTargetVal">--- kcal</span>
+          <span class="stat-label" id="homeCalorieTargetLabel">GÜNLÜK HEDEF KALORİ</span>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" onclick="switchToTab('su-page')">
           <i class="fa-solid fa-droplet"></i>
           <span class="stat-val" id="homeWaterDisplay">0 ml</span>
           <span class="stat-label">Su Tüketimi</span>
@@ -470,11 +472,10 @@
       <iframe src="takvim.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
-    <!-- index.html içindeki adım sayfası iframe'i -->
-<!-- index.html içindeki tab-content alanı -->
-<div id="makro-page" class="tab-content" style="padding: 0;">
-  <iframe src="makro.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
-</div>
+    <!-- 3. MAKRO SAYFASI (Adım Yerine) -->
+    <div id="makro-page" class="tab-content" style="padding: 0;">
+      <iframe src="makro.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
+    </div>
 
     <!-- 4. PLAYLIST SAYFASI -->
     <div id="music-page" class="tab-content" style="padding: 0;">
@@ -534,9 +535,9 @@
       <span>Takvim</span>
     </div>
 
-    <div class="nav-item" data-target="adim-page">
-      <i class="fa-solid fa-person-walking"></i>
-      <span>Adım</span>
+    <div class="nav-item" data-target="makro-page">
+      <i class="fa-solid fa-utensils"></i>
+      <span>Makro</span>
     </div>
 
     <div class="nav-item" data-target="music-page">
@@ -578,25 +579,36 @@
       tabContents.forEach(content => {
         content.classList.toggle('active', content.id === pageId);
       });
+
+      // Ön sayfaya dönüldüğünde makrodan gelen hedef kaloriyi tazele
+      if (pageId === 'home-page') {
+        updateDashboardTargetCalorie();
+      }
     }
 
     navItems.forEach(item => {
       item.addEventListener('click', function() {
         const targetPageId = this.getAttribute('data-target');
         switchToTab(targetPageId);
-
-        // Kullanıcı "Adım" sekmesine bastığında ana sayfa düzeyinde GPS izni iste
-        if (targetPageId === 'adim-page') {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-              (pos) => console.log("Ana sayfa konum izni alındı:", pos.coords),
-              (err) => console.warn("Ana sayfa konum reddedildi:", err.message),
-              { enableHighAccuracy: true }
-            );
-          }
-        }
       });
     });
+
+    // Makro Sayfasından Gelen Hedef Kaloriyi Oku & Göster
+    function updateDashboardTargetCalorie() {
+      const targetCal = localStorage.getItem('fitness_target_calorie');
+      const valEl = document.getElementById('homeCalorieTargetVal');
+      const lblEl = document.getElementById('homeCalorieTargetLabel');
+
+      if (targetCal && targetCal !== '0') {
+        valEl.textContent = `${targetCal} kcal`;
+        lblEl.textContent = "GÜNLÜK HEDEFİN";
+        valEl.style.color = "var(--primary-orange)";
+      } else {
+        valEl.textContent = "Hesapla";
+        lblEl.textContent = "HEDEF KALORİ BELİRLE";
+        valEl.style.color = "var(--text-muted)";
+      }
+    }
 
     // 30 Günlük Motivasyon Havuzu
     const quotes = [
@@ -681,6 +693,7 @@
 
     setDailyQuote();
     checkAndResetWater();
+    updateDashboardTargetCalorie();
     setInterval(checkAndResetWater, 60000);
   </script>
 </body>

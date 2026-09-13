@@ -146,28 +146,42 @@ Format:
   }
 });
 
-// 3. ENDPOINT: Yürüyüş Analizi (adim.html için)
-app.post('/api/analyze-walk', async (req, res) => {
+// 3. ENDPOINT: Akıllı Makro & Beslenme Asistanı (makro.html için)
+app.post('/api/generate-diet', async (req, res) => {
   try {
-    const { hedefAdi, secilenMesafeKm, kilo, tempo } = req.body;
+    const { targetCalories, protein, carbs, fat, goal, budgetType } = req.body;
 
-    if (!secilenMesafeKm) {
-      return res.status(400).json({ error: 'Mesafe bilgisi eksik.' });
+    if (!targetCalories || !protein) {
+      return res.status(400).json({ error: 'Hedef kalori ve protein değerleri eksik.' });
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return res.status(500).json({ error: 'Sunucuda API Key bulunamadı.' });
 
-    const prompt = `Kullanıcı mevcut konumundan "${hedefAdi || 'seçilen hedefe'}" yürüyecek:
-- Haritadaki Düz Kuş Uçuşu Mesafe: ${secilenMesafeKm} km (Şehir içi sokak kıvrımlarından ötürü gerçek yürüyüş genelde bunun %20-25 fazlasıdır, hesaba kat).
-- Sporcu Ağırlığı: ${kilo || 75} kg
-- Hedeflenen Tempo: ${tempo || 'Orta (5 km/s)'}
+    const isBudget = budgetType === 'student';
+    const foodFocus = isBudget
+      ? "Öğrenci/Bütçe dostu, markette en ucuz protein/kalori sağlayan besinler (lor peyniri, haşlanmış yumurta, yeşil mercimek, yer fıstığı, tavuk ciğeri/tavuk göğsü, bulgur, yulaf)."
+      : "Standart sporcu besinleri (dana eti, somon/balık, tavuk/hindi göğsü, basmati pirinç, yumurta, badem/ceviz).";
 
-Lütfen net ve samimi bir koç gibi yanıt ver:
-1. Gerçek sokak şartlarına göre tahmini yürüme mesafesi ve kaç dakika süreceği.
-2. Yakılacak ortalama kalori aralığı (kcal).
-3. Bu enerjinin karşılığı olan somut bir Türk mutfağı/atıştırmalık besin örneği (örn: 1 simit, yarım porsiyon döner vb.).
-4. Yürüyüş için 2 cümlelik pratik motivasyon ve hidrasyon/toparlanma önerisi.`;
+    const prompt = `Sen profesyonel bir sporcu diyetisyenisin. 
+Kullanıcı için şu makrolara BİREBİR UYGUN günlük tam 4 öğünlük beslenme planı hazırla:
+- Günlük Hedef Kalori: ${targetCalories} kcal
+- Protein: ${protein}g | Karbonhidrat: ${carbs}g | Yağ: ${fat}g
+- Hedef Dönemi: ${goal || 'Definasyon / Kas Gelişimi'}
+- Besin Stratejisi: ${foodFocus}
+
+Kesinlikle sadece geçerli bir JSON formatında yanıt ver. Markdown veya ek metin yazma.
+Format şu şemada olmalıdır:
+{
+  "coachTip": "Sporcuya bu hedefe ulaşması için 1-2 cümlelik pratik koç tavsiyesi",
+  "meals": [
+    {
+      "mealName": "1. Öğün (Kahvaltı)",
+      "items": "Örn: 4 yumurta (2 sarısı ile), 100g lor peyniri, 60g yulaf",
+      "macros": "Yaklaşık makro (örn: 42g P, 50g K, 18g Y)"
+    }
+  ]
+}`;
 
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
@@ -175,7 +189,8 @@ Lütfen net ve samimi bir koç gibi yanıt ver:
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { response_mime_type: "application/json" }
       })
     });
 
@@ -185,11 +200,11 @@ Lütfen net ve samimi bir koç gibi yanıt ver:
     }
 
     const data = await response.json();
-    const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Analiz üretilemedi.";
+    const resultJson = JSON.parse(data.candidates[0].content.parts[0].text);
 
-    res.json({ text: resultText });
+    res.json(resultJson);
   } catch (err) {
-    console.error("Yürüyüş Analiz Hatası:", err.message);
+    console.error("Diyet/Makro Asistan Hatası:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
