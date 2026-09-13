@@ -1,441 +1,457 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <link rel="icon" type="image/png" href="Gemini_Generated_Image_bjczfnbjczfnbjcz (1).jpg">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Konumdan Hedefe - AI Yürüyüş Analizi</title>
-  
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Canlı Aktivite & Kalori Takibi</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
     :root {
       --brand-orange: #fc6A03;
-      --brand-orange-hover: #e05c00;
-      --pure-black: #000000;
-      --surface-black: #111111;
+      --pure-black: #0a0a0a;
+      --surface-black: #141414;
+      --surface-card: #1c1c1c;
       --pure-white: #ffffff;
-      --border-dark: #222222;
+      --border-dark: #262626;
       --muted-gray: #888888;
+      --green-active: #00e676;
     }
 
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { margin: 0; padding: 0; background: var(--pure-black); color: var(--pure-white); display: flex; flex-direction: column; height: 100vh; }
-    
-    #map { flex: 1; width: 100%; z-index: 1; background: var(--surface-black); }
-    
-    .panel {
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
       background: var(--pure-black);
-      padding: 18px 20px;
-      border-top: 2px solid var(--brand-orange);
-      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.95);
-      z-index: 10;
-      max-height: 52vh;
-      overflow-y: auto;
-    }
-
-    .search-box {
+      color: var(--pure-white);
+      min-height: 100vh;
       display: flex;
-      gap: 10px;
-      margin-bottom: 14px;
+      flex-direction: column;
+      padding: 16px;
+      overflow-x: hidden;
     }
 
-    .search-input {
-      flex: 1;
-      padding: 12px 16px;
-      border-radius: 8px;
-      border: 1px solid var(--border-dark);
-      background: var(--surface-black);
-      color: var(--pure-white);
-      font-size: 14px;
-      outline: none;
-      transition: 0.2s ease;
+    /* Üst Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-dark);
     }
 
-    .search-input:focus {
-      border-color: var(--brand-orange);
-      box-shadow: 0 0 0 3px rgba(252, 106, 3, 0.25);
-    }
-
-    .btn-search {
-      background: var(--brand-orange);
-      color: var(--pure-black);
-      border: none;
-      border-radius: 8px;
-      padding: 0 20px;
+    .top-bar h1 {
+      font-size: 1.1rem;
       font-weight: 800;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: 0.2s ease;
-    }
-
-    .btn-search:hover {
-      background: var(--brand-orange-hover);
-    }
-
-    .row { display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .status-badge {
-      font-size: 13px;
-      padding: 6px 14px;
-      border-radius: 20px;
-      background: var(--surface-black);
-      color: var(--brand-orange);
-      border: 1px solid var(--brand-orange);
-      font-weight: 600;
-      line-height: 1.4;
-    }
-    
-    .inputs { display: flex; gap: 10px; margin-bottom: 14px; }
-    .input-field { flex: 1; }
-    label { font-size: 11px; color: var(--pure-white); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; display: block; margin-bottom: 5px; }
-    
-    input, select {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border-dark);
-      background: var(--surface-black);
-      color: var(--pure-white);
-      font-size: 14px;
-      outline: none;
-    }
-
-    input:focus, select:focus {
-      border-color: var(--brand-orange);
-    }
-
-    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
-    .stat-box {
-      background: var(--surface-black);
-      padding: 12px;
-      border-radius: 8px;
-      text-align: center;
-      border: 1px solid var(--border-dark);
-    }
-    .stat-val { font-size: 20px; font-weight: 900; color: var(--brand-orange); }
-    .stat-lbl { font-size: 11px; color: var(--pure-white); text-transform: uppercase; margin-top: 3px; font-weight: 600; }
-
-    .btn-group { display: flex; gap: 10px; }
-    .btn {
-      flex: 1;
-      padding: 14px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: 0.2s ease;
-      text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    
-    .btn-calc {
-      background: var(--brand-orange);
-      color: var(--pure-black);
-    }
-    .btn-calc:hover {
-      background: var(--brand-orange-hover);
-    }
-    .btn-calc:disabled {
+
+    .status-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
       background: #222;
-      color: #666;
-      cursor: not-allowed;
-      border: 1px solid #333;
+      color: var(--muted-gray);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .btn-relocate {
-      background: var(--pure-white);
-      color: var(--pure-black);
-      flex: 0.45;
-      font-size: 13px;
-    }
-    .btn-relocate:hover {
-      background: #e5e5e5;
+    .status-pill.active {
+      background: rgba(0, 230, 118, 0.15);
+      color: var(--green-active);
+      border: 1px solid var(--green-active);
     }
 
-    .ai-result {
-      margin-top: 16px;
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* Ana Kalori Göstergesi */
+    .main-burn {
+      background: linear-gradient(145deg, #18120e, var(--surface-black));
+      border: 1px solid var(--border-dark);
+      border-top: 3px solid var(--brand-orange);
+      border-radius: 20px;
+      padding: 24px 16px;
+      text-align: center;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    .burn-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--muted-gray);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .burn-value {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: var(--brand-orange);
+      line-height: 1.1;
+      margin: 8px 0;
+      text-shadow: 0 0 20px rgba(252, 106, 3, 0.3);
+    }
+
+    .burn-unit {
+      font-size: 1.1rem;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .speed-tag {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: #aaa;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 12px;
+      border-radius: 12px;
+    }
+
+    /* 4'lü Metrik Izgarası */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .metric-card {
       background: var(--surface-black);
-      border-left: 4px solid var(--brand-orange);
-      border-radius: 8px;
-      padding: 16px;
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--pure-white);
-      display: none;
-      white-space: pre-line;
+      border: 1px solid var(--border-dark);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
     }
-    .ai-title { font-weight: 800; color: var(--brand-orange); margin-bottom: 8px; font-size: 14px; }
+
+    .metric-icon {
+      font-size: 1.2rem;
+      color: var(--brand-orange);
+      margin-bottom: 6px;
+    }
+
+    .metric-val {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .metric-lbl {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--muted-gray);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* Kilo & Hedef Ayarı */
+    .settings-bar {
+      background: var(--surface-card);
+      border: 1px solid var(--border-dark);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+    }
+
+    .weight-input {
+      background: #111;
+      border: 1px solid #333;
+      color: var(--brand-orange);
+      font-weight: 800;
+      padding: 6px 10px;
+      border-radius: 8px;
+      width: 65px;
+      text-align: center;
+      outline: none;
+    }
+
+    /* Butonlar */
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: 0.15s ease;
+      text-transform: uppercase;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-start {
+      background: var(--brand-orange);
+      color: #000;
+    }
+
+    .btn-stop {
+      background: #d32f2f;
+      color: #fff;
+      display: none;
+    }
+
+    .btn-reset {
+      background: #222;
+      color: var(--muted-gray);
+      flex: 0.4;
+    }
   </style>
 </head>
 <body>
 
-  <div id="map"></div>
-
-  <div class="panel">
-    <div class="search-box">
-      <input type="text" id="aramaInput" class="search-input" placeholder="Hedef yazın (örn: Terracity, Eczane, Park)" onkeydown="if(event.key==='Enter') hedefAra()">
-      <button class="btn-search" onclick="hedefAra()">Rotayı Bul</button>
-    </div>
-
-    <div class="row">
-      <div class="status-badge" id="instruction">GPS konumu aranıyor...</div>
-    </div>
-
-    <div class="inputs">
-      <div class="input-field">
-        <label>Kilonuz (kg)</label>
-        <input type="number" id="kiloInput" value="75">
-      </div>
-      <div class="input-field">
-        <label>Yürüyüş Temposu</label>
-        <select id="tempoSelect">
-          <option value="yavas (4 km/s)">Sakin / Hafif (4 km/s)</option>
-          <option value="orta (5 km/s)" selected>Tempolu / Normal (5 km/s)</option>
-          <option value="hizli (6.5 km/s)">Hızlı / Tempolu (6.5 km/s)</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="stats">
-      <div class="stat-box">
-        <div class="stat-val" id="mesafeText">0.00 km</div>
-        <div class="stat-lbl">Kuş Uçuşu Mesafe</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-val" id="tahminiSureText">0 dk</div>
-        <div class="stat-lbl">Tahmini Yürüyüş Süresi</div>
-      </div>
-    </div>
-
-    <div class="btn-group">
-      <button class="btn btn-calc" id="btnAi" onclick="aiKaloriHesapla()" disabled>⚡ Gemini ile Analiz Et</button>
-      <button class="btn btn-relocate" onclick="konumumuBul()">📍 Konumu Yenile</button>
-    </div>
-
-    <div class="ai-result" id="aiBox">
-      <div class="ai-title">🔥 Yapay Zeka Antrenman Analizi:</div>
-      <div id="aiText">Hesaplanıyor...</div>
+  <div class="top-bar">
+    <h1>CANLI YÜRÜYÜŞ & KALORİ</h1>
+    <div class="status-pill" id="statusPill">
+      <span class="status-dot"></span>
+      <span id="statusText">Beklemede</span>
     </div>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Ana Kalori Ekranı -->
+  <div class="main-burn">
+    <div class="burn-title">Yakılan Aktif Kalori</div>
+    <div class="burn-value" id="calDisplay">0.0</div>
+    <div class="burn-unit">KCAL</div>
+    <div class="speed-tag" id="activityState">Hareketsiz Duruyor</div>
+  </div>
+
+  <!-- Metrikler -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <i class="fa-solid fa-route metric-icon"></i>
+      <div class="metric-val" id="distDisplay">0.00</div>
+      <div class="metric-lbl">Mesafe (KM)</div>
+    </div>
+    <div class="metric-card">
+      <i class="fa-solid fa-gauge-high metric-icon"></i>
+      <div class="metric-val" id="speedDisplay">0.0</div>
+      <div class="metric-lbl">Anlık Hız (KM/S)</div>
+    </div>
+    <div class="metric-card">
+      <i class="fa-solid fa-stopwatch metric-icon"></i>
+      <div class="metric-val" id="timeDisplay">00:00</div>
+      <div class="metric-lbl">Hareket Süresi</div>
+    </div>
+    <div class="metric-card">
+      <i class="fa-solid fa-shoe-prints metric-icon"></i>
+      <div class="metric-val" id="stepDisplay">0</div>
+      <div class="metric-lbl">Yaklaşık Adım</div>
+    </div>
+  </div>
+
+  <!-- Kilo Ayarı -->
+  <div class="settings-bar">
+    <span>Hesaplama Kilonuz:</span>
+    <div>
+      <input type="number" id="weightInput" class="weight-input" value="75">
+      <span style="color: var(--muted-gray); font-size: 0.8rem;">kg</span>
+    </div>
+  </div>
+
+  <!-- Kontroller -->
+  <div class="controls">
+    <button class="btn btn-reset" onclick="resetTracking()"><i class="fa-solid fa-rotate-left"></i></button>
+    <button class="btn btn-start" id="btnStart" onclick="startTracking()"><i class="fa-solid fa-play"></i> Takibi Başlat</button>
+    <button class="btn btn-stop" id="btnStop" onclick="stopTracking()"><i class="fa-solid fa-pause"></i> Durdur</button>
+  </div>
 
   <script>
-    const BACKEND_URL = "https://fitness-backend-opv7.onrender.com/api/analyze-walk";
+    let watchId = null;
+    let timerInterval = null;
+    let isTracking = false;
 
-    let map;
-    let baslangicNoktasi = null;
-    let baslangicMarker = null;
-    let hedefMarker = null;
-    let rotaCizgisi = null;
-    let secilenMesafeKm = 0;
-    let hedefAdi = "";
+    let totalMeters = 0;
+    let totalCalories = 0.0;
+    let secondsElapsed = 0;
+    let lastPosition = null;
+    let currentSpeedKmh = 0;
 
-    function initMap() {
-      // Haritayı dünya genelinde başlat, koordinata zorlama
-      map = L.map('map').setView([39.0, 35.0], 6);
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap'
-      }).addTo(map);
-
-      map.on('click', (e) => {
-        if (!baslangicNoktasi) {
-          baslangicBelirle(e.latlng.lat, e.latlng.lng, "Seçtiğiniz Başlangıç");
-          document.getElementById("instruction").innerText = "Başlangıç seçildi. Şimdi hedefe dokunun.";
-        } else {
-          hedefAyarla(e.latlng.lat, e.latlng.lng, "Haritada Seçilen Hedef");
-        }
-      });
-
-      konumumuBul();
+    // Haversine Formülü: İki koordinat arası kesin metre
+    function getDistanceMeters(lat1, lon1, lat2, lon2) {
+      const R = 6371e3; // Dünya yarıçapı (m)
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = 
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
     }
 
-    function baslangicBelirle(lat, lng, baslik) {
-      baslangicNoktasi = { lat, lng };
-
-      if (baslangicMarker) map.removeLayer(baslangicMarker);
-
-      baslangicMarker = L.circleMarker([lat, lng], {
-        radius: 9,
-        fillColor: "#fc6A03",
-        color: "#ffffff",
-        weight: 3,
-        opacity: 1,
-        fillOpacity: 1
-      }).addTo(map).bindPopup(`<b>${baslik}</b>`).openPopup();
-
-      map.setView([lat, lng], 16);
-      if (hedefMarker) rotayiYenile();
+    // Hıza göre bilimsel MET katsayısı
+    function getMetBySpeed(speedKmh) {
+      if (speedKmh < 1.0) return 0;       // Duruyor, ekstra kalori yok
+      if (speedKmh < 3.8) return 2.8;     // Yavaş yürüyüş
+      if (speedKmh < 5.4) return 3.5;     // Normal tempo
+      if (speedKmh < 6.8) return 5.0;     // Hızlı yürüyüş / tempolu
+      if (speedKmh < 9.0) return 8.3;     // Hafif koşu (jogging)
+      return 11.0;                        // Koşu
     }
 
-    function konumumuBul() {
-      const info = document.getElementById("instruction");
-      info.innerText = "GPS aranıyor, lütfen izin verin...";
-
+    function startTracking() {
       if (!navigator.geolocation) {
-        info.innerText = "Cihazda GPS yok. Haritaya dokunarak başlangıç seçin.";
+        alert("Cihazınızda konum servisi desteklenmiyor.");
         return;
       }
 
-      // Yüksek doğruluklu gerçek telefon GPS'i
-      navigator.geolocation.getCurrentPosition(
+      isTracking = true;
+      document.getElementById('btnStart').style.display = 'none';
+      document.getElementById('btnStop').style.display = 'flex';
+      
+      const pill = document.getElementById('statusPill');
+      pill.classList.add('active');
+      document.getElementById('statusText').innerText = "Canlı Takipte";
+
+      // Süre sayacı ve 1 saniyelik baz kalori hesabı
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        updateTimerDisplay();
+
+        // Anlık hıza göre her saniye kalori yakımı
+        const weight = parseFloat(document.getElementById('weightInput').value) || 75;
+        const met = getMetBySpeed(currentSpeedKmh);
+
+        if (met > 0) {
+          // Formül: (MET * 3.5 * Kilo / 200) / 60 = saniyede yakılan kcal
+          const calPerSecond = (met * 3.5 * weight) / (200 * 60);
+          totalCalories += calPerSecond;
+          document.getElementById('calDisplay').innerText = totalCalories.toFixed(1);
+        }
+      }, 1000);
+
+      // Yüksek hassasiyetli GPS dinleyicisi
+      watchId = navigator.geolocation.watchPosition(
         (pos) => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
-          baslangicBelirle(lat, lng, "Mevcut Konumunuz");
-          info.innerText = "Konumunuz tespit edildi! Hedef arayın veya dokunun.";
+          const accuracy = pos.coords.accuracy;
+
+          // GPS sapması 25 metreden fazlaysa atla
+          if (accuracy > 25) return;
+
+          if (lastPosition) {
+            const dMeters = getDistanceMeters(lastPosition.lat, lastPosition.lng, lat, lng);
+            const timeDiffSec = (pos.timestamp - lastPosition.timestamp) / 1000;
+
+            // GPS parazitlerini engellemek için minimum 2.5 metre hareket şartı
+            if (dMeters >= 2.5 && timeDiffSec > 0) {
+              totalMeters += dMeters;
+
+              // Anlık hız (km/s)
+              currentSpeedKmh = (dMeters / timeDiffSec) * 3.6;
+
+              // İmkansız hızları sınırla (telefon sapması)
+              if (currentSpeedKmh > 25) currentSpeedKmh = 5;
+
+              updateMetricsDisplay();
+            } else if (timeDiffSec > 4) {
+              // 4 saniyedir hareket yoksa duruyor kabul et
+              currentSpeedKmh = 0;
+              document.getElementById('speedDisplay').innerText = "0.0";
+              document.getElementById('activityState').innerText = "Duruyor";
+            }
+          }
+
+          lastPosition = { lat, lng, timestamp: pos.timestamp };
         },
         (err) => {
           console.warn("GPS Hatası:", err);
-          if (err.code === 1) {
-            info.innerText = "Konum izni reddedildi. Tarayıcı ayarlarından konuma izin verin.";
-          } else {
-            info.innerText = "GPS sinyali alınamadı. Haritadan başlangıca dokunun.";
-          }
+          document.getElementById('statusText').innerText = "Sinyal Yok";
         },
-        { 
-          enableHighAccuracy: true, // Gerçek GPS çipi
-          timeout: 15000,           // 15 sn bekle
-          maximumAge: 0             // Önbellek kullanma, anlık al
+        {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 10000
         }
       );
     }
 
-    async function hedefAra() {
-      const sorgu = document.getElementById("aramaInput").value.trim();
-      const info = document.getElementById("instruction");
-      if (!sorgu) return;
+    function stopTracking() {
+      isTracking = false;
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+      if (timerInterval) clearInterval(timerInterval);
 
-      if (!baslangicNoktasi) {
-        alert("Önce GPS'in gelmesini bekleyin veya haritadan başlangıç noktasına dokunun.");
-        return;
-      }
+      document.getElementById('btnStart').style.display = 'flex';
+      document.getElementById('btnStop').style.display = 'none';
 
-      info.innerText = `"${sorgu}" aranıyor...`;
-
-      try {
-        const delta = 0.25;
-        const minLng = baslangicNoktasi.lng - delta;
-        const maxLng = baslangicNoktasi.lng + delta;
-        const minLat = baslangicNoktasi.lat - delta;
-        const maxLat = baslangicNoktasi.lat + delta;
-
-        let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(sorgu)}&viewbox=${minLng},${maxLat},${maxLng},${minLat}&bounded=1&limit=10`;
-        let res = await fetch(url);
-        let data = await res.json();
-
-        if (!data || data.length === 0) {
-          const fallbackUrl = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=tr&q=${encodeURIComponent(sorgu)}&limit=10`;
-          res = await fetch(fallbackUrl);
-          data = await res.json();
-        }
-
-        if (data && data.length > 0) {
-          let enYakinYer = data[0];
-          let enKisaMesafe = map.distance([baslangicNoktasi.lat, baslangicNoktasi.lng], [parseFloat(data[0].lat), parseFloat(data[0].lon)]);
-
-          for (let i = 1; i < data.length; i++) {
-            const m = map.distance([baslangicNoktasi.lat, baslangicNoktasi.lng], [parseFloat(data[i].lat), parseFloat(data[i].lon)]);
-            if (m < enKisaMesafe) {
-              enKisaMesafe = m;
-              enYakinYer = data[i];
-            }
-          }
-
-          const lat = parseFloat(enYakinYer.lat);
-          const lng = parseFloat(enYakinYer.lon);
-          hedefAdi = enYakinYer.display_name.split(",")[0];
-          
-          hedefAyarla(lat, lng, `${hedefAdi}`);
-          info.innerText = `Hedef: ${hedefAdi} (${(enKisaMesafe / 1000).toFixed(2)} km)`;
-        } else {
-          info.innerText = "Hedef bulunamadı, haritadan noktaya dokunabilirsiniz.";
-        }
-      } catch (err) {
-        info.innerText = "Arama servisine ulaşılamadı. Haritaya dokunarak seçin.";
-      }
+      const pill = document.getElementById('statusPill');
+      pill.classList.remove('active');
+      document.getElementById('statusText').innerText = "Durduruldu";
+      document.getElementById('speedDisplay').innerText = "0.0";
+      currentSpeedKmh = 0;
     }
 
-    function hedefAyarla(lat, lng, baslik) {
-      hedefAdi = baslik;
+    function resetTracking() {
+      stopTracking();
+      totalMeters = 0;
+      totalCalories = 0.0;
+      secondsElapsed = 0;
+      lastPosition = null;
+      currentSpeedKmh = 0;
 
-      if (hedefMarker) map.removeLayer(hedefMarker);
-
-      hedefMarker = L.marker([lat, lng]).addTo(map)
-        .bindPopup(`<b>${baslik}</b>`)
-        .openPopup();
-
-      rotayiYenile();
+      document.getElementById('calDisplay').innerText = "0.0";
+      document.getElementById('distDisplay').innerText = "0.00";
+      document.getElementById('speedDisplay').innerText = "0.0";
+      document.getElementById('stepDisplay').innerText = "0";
+      document.getElementById('timeDisplay').innerText = "00:00";
+      document.getElementById('activityState').innerText = "Hareketsiz Duruyor";
+      document.getElementById('statusText').innerText = "Beklemede";
     }
 
-    function rotayiYenile() {
-      if (!baslangicNoktasi || !hedefMarker) return;
+    function updateMetricsDisplay() {
+      const km = totalMeters / 1000;
+      document.getElementById('distDisplay').innerText = km.toFixed(2);
+      document.getElementById('speedDisplay').innerText = currentSpeedKmh.toFixed(1);
 
-      const hedefLatLng = hedefMarker.getLatLng();
+      // Ortalama adım boyu (0.75m) üzerinden yaklaşık adım
+      const steps = Math.round(totalMeters / 0.75);
+      document.getElementById('stepDisplay').innerText = steps;
 
-      if (rotaCizgisi) map.removeLayer(rotaCizgisi);
-
-      const noktalar = [
-        [baslangicNoktasi.lat, baslangicNoktasi.lng],
-        [hedefLatLng.lat, hedefLatLng.lng]
-      ];
-
-      rotaCizgisi = L.polyline(noktalar, { color: '#fc6A03', weight: 4, dashArray: '6, 8' }).addTo(map);
-      map.fitBounds(rotaCizgisi.getBounds(), { padding: [40, 40] });
-
-      const mesafeMetre = map.distance([baslangicNoktasi.lat, baslangicNoktasi.lng], [hedefLatLng.lat, hedefLatLng.lng]);
-      secilenMesafeKm = (mesafeMetre / 1000).toFixed(2);
-
-      const dakika = Math.round((secilenMesafeKm / 5) * 60);
-
-      document.getElementById("mesafeText").innerText = `${secilenMesafeKm} km`;
-      document.getElementById("tahminiSureText").innerText = `${dakika} dk`;
-      document.getElementById("btnAi").disabled = false;
+      // Durum etiketi
+      const stateEl = document.getElementById('activityState');
+      if (currentSpeedKmh < 1.0) stateEl.innerText = "Duruyor";
+      else if (currentSpeedKmh < 5.0) stateEl.innerText = "Yavaş / Normal Yürüyüş";
+      else if (currentSpeedKmh < 7.0) stateEl.innerText = "Tempolu Yürüyüş";
+      else stateEl.innerText = "Koşu";
     }
 
-    async function aiKaloriHesapla() {
-      if (secilenMesafeKm <= 0) return;
-
-      const kilo = document.getElementById("kiloInput").value || 75;
-      const tempo = document.getElementById("tempoSelect").value;
-      const aiBox = document.getElementById("aiBox");
-      const aiText = document.getElementById("aiText");
-      const btnAi = document.getElementById("btnAi");
-
-      aiBox.style.display = "block";
-      aiText.innerText = "Gemini yürüyüş rotasını ve yakılacak kaloriyi analiz ediyor...";
-      btnAi.disabled = true;
-
-      try {
-        const response = await fetch(BACKEND_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            hedefAdi: hedefAdi || "Seçilen Rota",
-            secilenMesafeKm: secilenMesafeKm,
-            kilo: kilo,
-            tempo: tempo
-          })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          aiText.innerHTML = `<span style="color:#fc6A03; font-weight:bold;">Hata:</span> ${data.error || 'Sunucu hatası'}`;
-          return;
-        }
-
-        aiText.innerText = data.text;
-      } catch (err) {
-        aiText.innerText = "Sunucuya bağlanılamadı. (" + err.message + ")";
-      } finally {
-        btnAi.disabled = false;
-      }
+    function updateTimerDisplay() {
+      const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+      const secs = (secondsElapsed % 60).toString().padStart(2, '0');
+      document.getElementById('timeDisplay').innerText = `${mins}:${secs}`;
     }
-
-    window.onload = initMap;
   </script>
 </body>
 </html>
