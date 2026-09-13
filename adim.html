@@ -36,24 +36,23 @@
       overflow-x: hidden;
     }
 
-    /* Üst Bar */
     .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       padding-bottom: 12px;
       border-bottom: 1px solid var(--border-dark);
     }
 
     .top-bar h1 {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 800;
       letter-spacing: 0.5px;
     }
 
     .status-pill {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
       padding: 4px 10px;
       border-radius: 20px;
@@ -77,20 +76,19 @@
       background: currentColor;
     }
 
-    /* Ana Kalori Göstergesi */
     .main-burn {
       background: linear-gradient(145deg, #18120e, var(--surface-black));
       border: 1px solid var(--border-dark);
       border-top: 3px solid var(--brand-orange);
-      border-radius: 20px;
-      padding: 24px 16px;
+      border-radius: 18px;
+      padding: 20px 16px;
       text-align: center;
-      margin-bottom: 16px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
     }
 
     .burn-title {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 700;
       color: var(--muted-gray);
       text-transform: uppercase;
@@ -98,77 +96,75 @@
     }
 
     .burn-value {
-      font-size: 3.5rem;
+      font-size: 3.2rem;
       font-weight: 900;
       color: var(--brand-orange);
       line-height: 1.1;
-      margin: 8px 0;
+      margin: 6px 0;
       text-shadow: 0 0 20px rgba(252, 106, 3, 0.3);
     }
 
     .burn-unit {
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: #fff;
       font-weight: 700;
     }
 
     .speed-tag {
       display: inline-block;
-      margin-top: 10px;
-      font-size: 0.8rem;
-      color: #aaa;
+      margin-top: 8px;
+      font-size: 0.78rem;
+      color: #bbb;
       background: rgba(255, 255, 255, 0.05);
       padding: 4px 12px;
       border-radius: 12px;
     }
 
-    /* 4'lü Metrik Izgarası */
     .metrics-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 10px;
+      margin-bottom: 14px;
     }
 
     .metric-card {
       background: var(--surface-black);
       border: 1px solid var(--border-dark);
-      border-radius: 14px;
-      padding: 14px;
+      border-radius: 12px;
+      padding: 12px;
       text-align: center;
     }
 
     .metric-icon {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       color: var(--brand-orange);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .metric-val {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: 800;
       color: #fff;
     }
 
     .metric-lbl {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 600;
       color: var(--muted-gray);
       text-transform: uppercase;
       margin-top: 2px;
     }
 
-    /* Kilo & Hedef Ayarı */
     .settings-bar {
       background: var(--surface-card);
       border: 1px solid var(--border-dark);
-      border-radius: 12px;
-      padding: 10px 14px;
+      border-radius: 10px;
+      padding: 8px 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      font-size: 0.85rem;
+      margin-bottom: 12px;
+      font-size: 0.8rem;
     }
 
     .weight-input {
@@ -176,26 +172,37 @@
       border: 1px solid #333;
       color: var(--brand-orange);
       font-weight: 800;
-      padding: 6px 10px;
-      border-radius: 8px;
-      width: 65px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      width: 55px;
       text-align: center;
       outline: none;
     }
 
-    /* Butonlar */
+    /* Canlı Durum ve Debug Paneli */
+    .debug-box {
+      font-size: 0.72rem;
+      color: var(--muted-gray);
+      background: #0d0d0d;
+      border: 1px dashed #262626;
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
     .controls {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       margin-top: auto;
     }
 
     .btn {
       flex: 1;
-      padding: 16px;
+      padding: 14px;
       border: none;
-      border-radius: 12px;
-      font-size: 0.95rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
       font-weight: 800;
       cursor: pointer;
       display: flex;
@@ -224,29 +231,27 @@
     .btn-reset {
       background: #222;
       color: var(--muted-gray);
-      flex: 0.4;
+      flex: 0.35;
     }
   </style>
 </head>
 <body>
 
   <div class="top-bar">
-    <h1>CANLI YÜRÜYÜŞ & KALORİ</h1>
+    <h1>CANLI YÜRÜYÜŞ</h1>
     <div class="status-pill" id="statusPill">
       <span class="status-dot"></span>
-      <span id="statusText">Beklemede</span>
+      <span id="statusText">Hazır</span>
     </div>
   </div>
 
-  <!-- Ana Kalori Ekranı -->
   <div class="main-burn">
     <div class="burn-title">Yakılan Aktif Kalori</div>
     <div class="burn-value" id="calDisplay">0.0</div>
     <div class="burn-unit">KCAL</div>
-    <div class="speed-tag" id="activityState">Hareketsiz Duruyor</div>
+    <div class="speed-tag" id="activityState">Hareketsiz</div>
   </div>
 
-  <!-- Metrikler -->
   <div class="metrics-grid">
     <div class="metric-card">
       <i class="fa-solid fa-route metric-icon"></i>
@@ -261,28 +266,31 @@
     <div class="metric-card">
       <i class="fa-solid fa-stopwatch metric-icon"></i>
       <div class="metric-val" id="timeDisplay">00:00</div>
-      <div class="metric-lbl">Hareket Süresi</div>
+      <div class="metric-lbl">Geçen Süre</div>
     </div>
     <div class="metric-card">
       <i class="fa-solid fa-shoe-prints metric-icon"></i>
       <div class="metric-val" id="stepDisplay">0</div>
-      <div class="metric-lbl">Yaklaşık Adım</div>
+      <div class="metric-lbl">Tahmini Adım</div>
     </div>
   </div>
 
-  <!-- Kilo Ayarı -->
   <div class="settings-bar">
-    <span>Hesaplama Kilonuz:</span>
+    <span>Kilonuz:</span>
     <div>
       <input type="number" id="weightInput" class="weight-input" value="75">
-      <span style="color: var(--muted-gray); font-size: 0.8rem;">kg</span>
+      <span style="color: var(--muted-gray);">kg</span>
     </div>
   </div>
 
-  <!-- Kontroller -->
+  <!-- Canlı GPS Bildirim Kutusu -->
+  <div class="debug-box" id="debugLog">
+    GPS durumu: Henüz başlatılmadı. "Takibi Başlat"a basın.
+  </div>
+
   <div class="controls">
     <button class="btn btn-reset" onclick="resetTracking()"><i class="fa-solid fa-rotate-left"></i></button>
-    <button class="btn btn-start" id="btnStart" onclick="startTracking()"><i class="fa-solid fa-play"></i> Takibi Başlat</button>
+    <button class="btn btn-start" id="btnStart" onclick="startTracking()"><i class="fa-solid fa-play"></i> Başlat</button>
     <button class="btn btn-stop" id="btnStop" onclick="stopTracking()"><i class="fa-solid fa-pause"></i> Durdur</button>
   </div>
 
@@ -290,16 +298,35 @@
     let watchId = null;
     let timerInterval = null;
     let isTracking = false;
+    let wakeLock = null;
+
+    let startTime = null;
+    let accumulatedSeconds = 0;
 
     let totalMeters = 0;
     let totalCalories = 0.0;
-    let secondsElapsed = 0;
-    let lastPosition = null;
+    let lastCoord = null;
     let currentSpeedKmh = 0;
 
-    // Haversine Formülü: İki koordinat arası kesin metre
+    // Ekranın kapanmasını engelleyen Wake Lock API
+    async function requestWakeLock() {
+      if ('wakeLock' in navigator) {
+        try {
+          wakeLock = await navigator.wakeLock.request('screen');
+        } catch (err) {
+          console.warn("WakeLock alınamadı:", err);
+        }
+      }
+    }
+
+    function releaseWakeLock() {
+      if (wakeLock !== null) {
+        wakeLock.release().then(() => wakeLock = null);
+      }
+    }
+
     function getDistanceMeters(lat1, lon1, lat2, lon2) {
-      const R = 6371e3; // Dünya yarıçapı (m)
+      const R = 6371e3;
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
       const a = 
@@ -310,89 +337,94 @@
       return R * c;
     }
 
-    // Hıza göre bilimsel MET katsayısı
     function getMetBySpeed(speedKmh) {
-      if (speedKmh < 1.0) return 0;       // Duruyor, ekstra kalori yok
-      if (speedKmh < 3.8) return 2.8;     // Yavaş yürüyüş
-      if (speedKmh < 5.4) return 3.5;     // Normal tempo
-      if (speedKmh < 6.8) return 5.0;     // Hızlı yürüyüş / tempolu
-      if (speedKmh < 9.0) return 8.3;     // Hafif koşu (jogging)
-      return 11.0;                        // Koşu
+      if (speedKmh < 1.2) return 0;
+      if (speedKmh < 3.8) return 2.8;
+      if (speedKmh < 5.5) return 3.8;
+      if (speedKmh < 7.0) return 5.0;
+      return 8.0;
     }
 
     function startTracking() {
       if (!navigator.geolocation) {
-        alert("Cihazınızda konum servisi desteklenmiyor.");
+        alert("Cihazınızda GPS desteği bulunamadı.");
         return;
       }
 
       isTracking = true;
+      startTime = Date.now() - (accumulatedSeconds * 1000);
+      requestWakeLock();
+
       document.getElementById('btnStart').style.display = 'none';
       document.getElementById('btnStop').style.display = 'flex';
       
       const pill = document.getElementById('statusPill');
       pill.classList.add('active');
-      document.getElementById('statusText').innerText = "Canlı Takipte";
+      document.getElementById('statusText').innerText = "Kayıtta";
+      document.getElementById('debugLog').innerText = "GPS uyduları aranıyor... Lütfen açık alanda olun.";
 
-      // Süre sayacı ve 1 saniyelik baz kalori hesabı
+      // Zaman Sayacı (Ekran kapansa bile Date.now() ile doğru süreyi yakalar)
       timerInterval = setInterval(() => {
-        secondsElapsed++;
-        updateTimerDisplay();
+        const now = Date.now();
+        const diffSeconds = Math.floor((now - startTime) / 1000);
+        accumulatedSeconds = diffSeconds;
 
-        // Anlık hıza göre her saniye kalori yakımı
+        const mins = Math.floor(diffSeconds / 60).toString().padStart(2, '0');
+        const secs = (diffSeconds % 60).toString().padStart(2, '0');
+        document.getElementById('timeDisplay').innerText = `${mins}:${secs}`;
+
+        // Kalori ekleme
         const weight = parseFloat(document.getElementById('weightInput').value) || 75;
         const met = getMetBySpeed(currentSpeedKmh);
-
         if (met > 0) {
-          // Formül: (MET * 3.5 * Kilo / 200) / 60 = saniyede yakılan kcal
-          const calPerSecond = (met * 3.5 * weight) / (200 * 60);
-          totalCalories += calPerSecond;
+          const calPerSec = (met * 3.5 * weight) / (200 * 60);
+          totalCalories += calPerSec;
           document.getElementById('calDisplay').innerText = totalCalories.toFixed(1);
         }
       }, 1000);
 
-      // Yüksek hassasiyetli GPS dinleyicisi
+      // GPS İzleme
       watchId = navigator.geolocation.watchPosition(
         (pos) => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
-          const accuracy = pos.coords.accuracy;
+          const accuracy = Math.round(pos.coords.accuracy);
 
-          // GPS sapması 25 metreden fazlaysa atla
-          if (accuracy > 25) return;
+          document.getElementById('debugLog').innerText = `GPS Aktif. Hassasiyet: ±${accuracy}m. Konum alındı.`;
 
-          if (lastPosition) {
-            const dMeters = getDistanceMeters(lastPosition.lat, lastPosition.lng, lat, lng);
-            const timeDiffSec = (pos.timestamp - lastPosition.timestamp) / 1000;
+          if (lastCoord) {
+            const d = getDistanceMeters(lastCoord.lat, lastCoord.lng, lat, lng);
+            const timeDiff = (pos.timestamp - lastCoord.time) / 1000;
 
-            // GPS parazitlerini engellemek için minimum 2.5 metre hareket şartı
-            if (dMeters >= 2.5 && timeDiffSec > 0) {
-              totalMeters += dMeters;
+            // 1 metreden büyük gerçek adım hareketlerini kabul et
+            if (d >= 1.2 && timeDiff > 0) {
+              totalMeters += d;
 
-              // Anlık hız (km/s)
-              currentSpeedKmh = (dMeters / timeDiffSec) * 3.6;
+              // Cihazın kendi hesapladığı hız varsa onu kullan, yoksa mesafe/zaman
+              if (pos.coords.speed !== null && pos.coords.speed > 0) {
+                currentSpeedKmh = pos.coords.speed * 3.6;
+              } else {
+                currentSpeedKmh = (d / timeDiff) * 3.6;
+              }
 
-              // İmkansız hızları sınırla (telefon sapması)
-              if (currentSpeedKmh > 25) currentSpeedKmh = 5;
-
-              updateMetricsDisplay();
-            } else if (timeDiffSec > 4) {
-              // 4 saniyedir hareket yoksa duruyor kabul et
-              currentSpeedKmh = 0;
-              document.getElementById('speedDisplay').innerText = "0.0";
-              document.getElementById('activityState').innerText = "Duruyor";
+              if (currentSpeedKmh > 20) currentSpeedKmh = 5.0; // GPS fırlaması koruması
+              updateUI();
             }
           }
 
-          lastPosition = { lat, lng, timestamp: pos.timestamp };
+          lastCoord = { lat, lng, time: pos.timestamp };
         },
         (err) => {
-          console.warn("GPS Hatası:", err);
-          document.getElementById('statusText').innerText = "Sinyal Yok";
+          let msg = "GPS Hatası: ";
+          if (err.code === 1) msg += "Konum izni verilmedi.";
+          else if (err.code === 2) msg += "Konum bulunamıyor (Uydu yok).";
+          else if (err.code === 3) msg += "Zaman aşımı.";
+          document.getElementById('debugLog').innerText = msg;
+          document.getElementById('statusText').innerText = "Hata";
         },
         {
           enableHighAccuracy: true,
-          maximumAge: 0,
+          maximumAge: 1000,
           timeout: 10000
         }
       );
@@ -402,6 +434,7 @@
       isTracking = false;
       if (watchId !== null) navigator.geolocation.clearWatch(watchId);
       if (timerInterval) clearInterval(timerInterval);
+      releaseWakeLock();
 
       document.getElementById('btnStart').style.display = 'flex';
       document.getElementById('btnStop').style.display = 'none';
@@ -409,16 +442,19 @@
       const pill = document.getElementById('statusPill');
       pill.classList.remove('active');
       document.getElementById('statusText').innerText = "Durduruldu";
-      document.getElementById('speedDisplay').innerText = "0.0";
       currentSpeedKmh = 0;
+      document.getElementById('speedDisplay').innerText = "0.0";
+      document.getElementById('activityState').innerText = "Durduruldu";
+      document.getElementById('debugLog').innerText = "Takip durduruldu.";
     }
 
     function resetTracking() {
       stopTracking();
       totalMeters = 0;
       totalCalories = 0.0;
-      secondsElapsed = 0;
-      lastPosition = null;
+      accumulatedSeconds = 0;
+      startTime = null;
+      lastCoord = null;
       currentSpeedKmh = 0;
 
       document.getElementById('calDisplay').innerText = "0.0";
@@ -426,31 +462,24 @@
       document.getElementById('speedDisplay').innerText = "0.0";
       document.getElementById('stepDisplay').innerText = "0";
       document.getElementById('timeDisplay').innerText = "00:00";
-      document.getElementById('activityState').innerText = "Hareketsiz Duruyor";
-      document.getElementById('statusText').innerText = "Beklemede";
+      document.getElementById('activityState').innerText = "Hareketsiz";
+      document.getElementById('statusText').innerText = "Hazır";
+      document.getElementById('debugLog').innerText = "Sayaçlar sıfırlandı.";
     }
 
-    function updateMetricsDisplay() {
-      const km = totalMeters / 1000;
-      document.getElementById('distDisplay').innerText = km.toFixed(2);
+    function updateUI() {
+      const km = (totalMeters / 1000).toFixed(2);
+      document.getElementById('distDisplay').innerText = km;
       document.getElementById('speedDisplay').innerText = currentSpeedKmh.toFixed(1);
 
-      // Ortalama adım boyu (0.75m) üzerinden yaklaşık adım
-      const steps = Math.round(totalMeters / 0.75);
+      const steps = Math.round(totalMeters / 0.74);
       document.getElementById('stepDisplay').innerText = steps;
 
-      // Durum etiketi
       const stateEl = document.getElementById('activityState');
-      if (currentSpeedKmh < 1.0) stateEl.innerText = "Duruyor";
-      else if (currentSpeedKmh < 5.0) stateEl.innerText = "Yavaş / Normal Yürüyüş";
-      else if (currentSpeedKmh < 7.0) stateEl.innerText = "Tempolu Yürüyüş";
+      if (currentSpeedKmh < 1.2) stateEl.innerText = "Hareketsiz";
+      else if (currentSpeedKmh < 4.5) stateEl.innerText = "Yavaş Yürüyüş";
+      else if (currentSpeedKmh < 6.5) stateEl.innerText = "Tempolu Yürüyüş";
       else stateEl.innerText = "Koşu";
-    }
-
-    function updateTimerDisplay() {
-      const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
-      const secs = (secondsElapsed % 60).toString().padStart(2, '0');
-      document.getElementById('timeDisplay').innerText = `${mins}:${secs}`;
     }
   </script>
 </body>
