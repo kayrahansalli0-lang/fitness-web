@@ -272,89 +272,6 @@
       border: none;
     }
 
-    /* --- SU TAKİBİ SAYFASI --- */
-    .water-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding-top: 30px;
-      gap: 20px;
-    }
-
-    .water-card {
-      background-color: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 18px;
-      padding: 30px 20px;
-      width: 100%;
-      max-width: 360px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 18px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    }
-
-    .water-icon {
-      font-size: 50px;
-      color: var(--primary-orange);
-      filter: drop-shadow(0 0 10px rgba(255, 107, 0, 0.4));
-    }
-
-    .water-amount {
-      font-size: 2.4rem;
-      font-weight: 800;
-      color: var(--accent-orange);
-    }
-
-    .water-target {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .water-controls {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      width: 100%;
-    }
-
-    .water-btn {
-      background-color: #111;
-      border: 1px solid var(--primary-orange);
-      color: var(--primary-orange);
-      padding: 12px;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-    }
-
-    .water-btn:active {
-      transform: scale(0.96);
-    }
-
-    .water-btn:hover {
-      background-color: var(--primary-orange);
-      color: #000;
-    }
-
-    .reset-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
     /* --- SABİT ALT MENÜ (BOTTOM NAV) --- */
     .bottom-nav {
       position: fixed;
@@ -427,17 +344,17 @@
         <p class="quote-text" id="dailyQuote">Yükleniyor...</p>
       </div>
 
-      <!-- İstatistikler: Yakılan Kalori Yerine Hedef Kalori -->
+      <!-- İstatistikler: Hedef Kalori & Dolap Şefi Kısayolu -->
       <div class="quick-stats-grid">
         <div class="stat-card" onclick="switchToTab('makro-page')">
           <i class="fa-solid fa-fire"></i>
           <span class="stat-val" id="homeCalorieTargetVal">--- kcal</span>
           <span class="stat-label" id="homeCalorieTargetLabel">GÜNLÜK HEDEF KALORİ</span>
         </div>
-        <div class="stat-card" onclick="switchToTab('su-page')">
-          <i class="fa-solid fa-droplet"></i>
-          <span class="stat-val" id="homeWaterDisplay">0 ml</span>
-          <span class="stat-label">Su Tüketimi</span>
+        <div class="stat-card" onclick="switchToTab('chef-page')">
+          <i class="fa-solid fa-kitchen-set"></i>
+          <span class="stat-val">Fit Tarif</span>
+          <span class="stat-label">DOLAP ŞEFİ</span>
         </div>
       </div>
 
@@ -472,7 +389,7 @@
       <iframe src="takvim.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
-    <!-- 3. MAKRO SAYFASI (Adım Yerine) -->
+    <!-- 3. MAKRO SAYFASI -->
     <div id="makro-page" class="tab-content" style="padding: 0;">
       <iframe src="makro.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
@@ -497,28 +414,9 @@
       <iframe src="dinlenme.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
-    <!-- 8. SU SAYFASI -->
-    <div id="su-page" class="tab-content">
-      <div class="water-container">
-        <div class="water-card">
-          <i class="fa-solid fa-droplet water-icon"></i>
-          <div>
-            <div class="water-amount" id="waterDisplay">0 ml</div>
-            <div class="water-target">Hedef: 3000 ml</div>
-          </div>
-
-          <div class="water-controls">
-            <button class="water-btn" onclick="addWater(200)">
-              <i class="fa-solid fa-glass-water"></i> +200 ml
-            </button>
-            <button class="water-btn" onclick="addWater(500)">
-              <i class="fa-solid fa-bottle-water"></i> +500 ml
-            </button>
-          </div>
-
-          <button class="reset-btn" onclick="resetWater()">Sayacı Sıfırla</button>
-        </div>
-      </div>
+    <!-- 8. DOLAP ŞEFİ SAYFASI (chef.html) -->
+    <div id="chef-page" class="tab-content" style="padding: 0;">
+      <iframe src="chef.html" loading="lazy" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
   </main>
@@ -560,9 +458,9 @@
       <span>Dinlenme</span>
     </div>
     
-    <div class="nav-item" data-target="su-page">
-      <i class="fa-solid fa-droplet"></i>
-      <span>Su</span>
+    <div class="nav-item" data-target="chef-page">
+      <i class="fa-solid fa-kitchen-set"></i>
+      <span>Şef</span>
     </div>
   </nav>
 
@@ -580,7 +478,6 @@
         content.classList.toggle('active', content.id === pageId);
       });
 
-      // Ön sayfaya dönüldüğünde makrodan gelen hedef kaloriyi tazele
       if (pageId === 'home-page') {
         updateDashboardTargetCalorie();
       }
@@ -651,37 +548,6 @@
       document.getElementById('dailyQuote').textContent = `"${quotes[dayIndex]}"`;
     }
 
-    // Su Takibi (Gece Sıfırlaması & LocalStorage)
-    function checkAndResetWater() {
-      const todayStr = new Date().toDateString();
-      const savedDate = localStorage.getItem('water_tracker_date');
-
-      if (savedDate !== todayStr) {
-        localStorage.setItem('water_tracker_date', todayStr);
-        localStorage.setItem('water_tracker_amount', '0');
-      }
-      updateWaterUI();
-    }
-
-    function addWater(amount) {
-      checkAndResetWater();
-      let currentWater = parseInt(localStorage.getItem('water_tracker_amount') || '0', 10);
-      currentWater += amount;
-      localStorage.setItem('water_tracker_amount', currentWater.toString());
-      updateWaterUI();
-    }
-
-    function resetWater() {
-      localStorage.setItem('water_tracker_amount', '0');
-      updateWaterUI();
-    }
-
-    function updateWaterUI() {
-      const amount = localStorage.getItem('water_tracker_amount') || '0';
-      document.getElementById('waterDisplay').textContent = `${amount} ml`;
-      document.getElementById('homeWaterDisplay').textContent = `${amount} ml`;
-    }
-
     // Service Worker Kaydı (PWA)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -692,9 +558,7 @@
     }
 
     setDailyQuote();
-    checkAndResetWater();
     updateDashboardTargetCalorie();
-    setInterval(checkAndResetWater, 60000);
   </script>
 </body>
 </html>
