@@ -11,7 +11,9 @@ console.log("Kontrol - Okunan Key:", API_KEY ? "ANAHTAR BULUNDU (GÜVENLİ)" : "
 
 const app = express();
 
-app.use(express.json({ limit: '10mb' }));
+// Fotoğraf verileri Base64 olarak geleceği için limiti 50mb yapıyoruz
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 app.use(express.static(path.join(__dirname)));
 
@@ -216,7 +218,7 @@ app.post('/api/fridge-chef', async (req, res) => {
     const { ingredientsText, imageBase64, targetProtein } = req.body;
 
     if (!ingredientsText && !imageBase64) {
-      return res.status(400).json({ error: 'Lütfen malzeme yazın veya fotoğraf yükleyin.' });
+      return res.status(400).json({ error: 'Lütfen malzeme yazın veya fotoğraf çekin.' });
     }
 
     const key = API_KEY || process.env.GEMINI_API_KEY;
@@ -231,21 +233,21 @@ app.post('/api/fridge-chef', async (req, res) => {
           data: imageBase64
         }
       });
-      parts.push({ text: "Fotoğraftaki malzemeleri belirle ve tarife dahil et." });
+      parts.push({ text: "Fotoğraftaki yiyecekleri, malzemeleri tanı ve bunları tarifte temel malzeme olarak kullan." });
     }
 
-    let promptContext = "Sen pratik bir fitness şefisin. ";
+    let promptContext = "Sen pratik ve profesyonel bir fitness şefisin. ";
     if (ingredientsText) {
-      promptContext += `Kullanıcının malzemeleri: ${ingredientsText}. `;
+      promptContext += `Kullanıcının ek olarak belirttiği malzemeler: ${ingredientsText}. `;
     }
     if (targetProtein) {
-      promptContext += `Hedef protein: yaklaşık ${targetProtein}g. `;
+      promptContext += `Hedeflenen yaklaşık protein: ${targetProtein}g. `;
     }
 
-    promptContext += `Eldeki malzemelerle maksimum 15 dakikada hazırlanabilecek yüksek proteinli bir sporcu tarifi ver.
-Yanıtı SADECE aşağıdaki JSON şemasına uygun ver:
+    promptContext += `Eldeki malzemelerle maksimum 15 dakikada hazırlanabilecek, sporculara uygun, yüksek proteinli lezzetli bir tarif oluştur.
+Yanıtı SADECE aşağıdaki JSON formatında ver. Başka hiçbir markdown veya açıklama yazma:
 {
-  "recipeName": "Örnek Tarif Başlığı",
+  "recipeName": "Tarif Başlığı",
   "prepTime": "12 dk",
   "macros": {
     "calories": 420,
@@ -253,12 +255,12 @@ Yanıtı SADECE aşağıdaki JSON şemasına uygun ver:
     "carbs": 20,
     "fat": 10
   },
-  "usedIngredients": ["3 yumurta", "100g lor peyniri"],
+  "usedIngredients": ["3 adet yumurta", "100g lor peyniri"],
   "instructions": [
-    "Yumurtaları ve loru çırpın.",
-    "Tavada orta ateşte 4 dakika pişirin."
+    "1. Adım",
+    "2. Adım"
   ],
-  "chefTip": "Tavsiye cümlesi"
+  "chefTip": "Kısa sporcu beslenme tavsiyesi"
 }`;
 
     parts.push({ text: promptContext });
@@ -278,29 +280,28 @@ Yanıtı SADECE aşağıdaki JSON şemasına uygun ver:
     });
 
     const resText = await response.text();
-    console.log("Chef Yanıt Kodu:", response.status);
+    console.log("Chef Yanıt Durumu:", response.status);
 
     if (!response.ok) {
-      console.error("Gemini Chef API Hatası:", resText);
+      console.error("Gemini Chef Hatası:", resText);
       return res.status(response.status).json({ error: `Gemini Hatası (${response.status}): ${resText}` });
     }
 
     const resJson = JSON.parse(resText);
     let rawText = resJson.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!rawText) {
-      console.error("Gemini Boş Cevap Döndü:", resJson);
-      return res.status(500).json({ error: "Yapay zeka geçerli bir tarif içeriği döndürmedi." });
+      console.error("Boş İçerik:", resJson);
+      return res.status(500).json({ error: "Gemini geçerli bir tarif metni döndüremedi." });
     }
 
     rawText = rawText.replace(/```json/gi, "").replace(/```/g, "").trim();
     const recipeData = JSON.parse(rawText);
 
-    // YouTube Video Araması (Varsa ekle, arama patlarsa tarifi bozma)
+    // YouTube Yapılış Videosu
     try {
       const videoId = await getYouTubeVideoId(`${recipeData.recipeName} fit tarif`);
       recipeData.videoId = videoId;
     } catch (ytErr) {
-      console.error("Tarif video arama hatası:", ytErr.message);
       recipeData.videoId = null;
     }
 

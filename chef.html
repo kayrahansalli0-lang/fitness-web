@@ -34,7 +34,6 @@
       padding-bottom: 40px;
     }
 
-    /* Başlık */
     .chef-header {
       display: flex;
       align-items: center;
@@ -73,7 +72,6 @@
       margin-top: 2px;
     }
 
-    /* Form Kartı */
     .input-card {
       background-color: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -83,6 +81,81 @@
       flex-direction: column;
       gap: 14px;
       margin-bottom: 20px;
+    }
+
+    .camera-container {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    video, img#snapshotPreview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #snapshotPreview {
+      display: none;
+    }
+
+    .camera-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .camera-placeholder i {
+      font-size: 2.2rem;
+      color: var(--primary-orange);
+    }
+
+    .camera-placeholder p {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .cam-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .cam-btn {
+      flex: 1;
+      padding: 11px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 1px solid var(--border-color);
+      background: #181818;
+      color: #fff;
+      transition: all 0.2s ease;
+    }
+
+    .cam-btn.primary {
+      background: #25160e;
+      border-color: var(--primary-orange);
+      color: var(--primary-orange);
+    }
+
+    .cam-btn:active {
+      transform: scale(0.97);
     }
 
     .form-group {
@@ -102,22 +175,17 @@
       gap: 6px;
     }
 
-    .form-group label i {
-      color: var(--primary-orange);
-    }
-
     textarea {
       width: 100%;
-      height: 90px;
+      height: 65px;
       background-color: #101010;
       border: 1px solid var(--border-color);
       border-radius: 10px;
-      padding: 12px;
+      padding: 10px;
       color: var(--text-main);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       resize: none;
       outline: none;
-      transition: border-color 0.2s ease;
     }
 
     textarea:focus {
@@ -140,12 +208,6 @@
       font-weight: 600;
     }
 
-    .number-input-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
     input[type="number"] {
       width: 65px;
       background: #1a1a1a;
@@ -157,10 +219,6 @@
       border-radius: 8px;
       text-align: center;
       outline: none;
-    }
-
-    input[type="number"]:focus {
-      border-color: var(--primary-orange);
     }
 
     .btn-submit {
@@ -176,11 +234,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: opacity 0.2s ease, transform 0.1s ease;
-    }
-
-    .btn-submit:active {
-      transform: scale(0.98);
+      transition: opacity 0.2s ease;
     }
 
     .btn-submit:disabled {
@@ -188,7 +242,6 @@
       cursor: not-allowed;
     }
 
-    /* Tarif Sonuç Kartı */
     .recipe-card {
       display: none;
       background: linear-gradient(135deg, #18120e, #141414);
@@ -208,7 +261,6 @@
       font-size: 1.15rem;
       font-weight: 800;
       color: #fff;
-      line-height: 1.3;
     }
 
     .recipe-time {
@@ -216,12 +268,8 @@
       color: var(--primary-orange);
       margin-top: 4px;
       font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
-    /* Makro Rozetleri */
     .macro-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -255,7 +303,6 @@
       margin-top: 2px;
     }
 
-    /* Malzeme ve Adım Listeleri */
     .section-title {
       font-size: 0.8rem;
       color: var(--primary-orange);
@@ -264,9 +311,6 @@
       font-weight: 800;
       margin-top: 14px;
       margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .ingredients-list {
@@ -297,31 +341,52 @@
       color: #ccc;
       line-height: 1.4;
     }
+
+    canvas {
+      display: none;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Başlık -->
   <div class="chef-header">
     <div class="chef-icon-box">
       <i class="fa-solid fa-kitchen-set"></i>
     </div>
     <div class="chef-header-text">
       <h1>Dolap <span>Şefi</span> 🍳</h1>
-      <p>Elindeki malzemelerle yüksek proteinli tarif</p>
+      <p>Kamerayı dolaba tut, yüksek proteinli tarif çıksın</p>
     </div>
   </div>
 
-  <!-- Giriş Formu -->
   <div class="input-card">
+    <div class="camera-container" id="camContainer">
+      <div class="camera-placeholder" id="camPlaceholder" onclick="startCamera()">
+        <i class="fa-solid fa-camera"></i>
+        <p>Kamerayı Başlat</p>
+        <span style="font-size: 0.72rem;">Dolabını veya tezgahı tara</span>
+      </div>
+      <video id="videoFeed" autoplay playsinline style="display: none;"></video>
+      <img id="snapshotPreview" alt="Çekilen Kare">
+    </div>
+
+    <div class="cam-actions">
+      <button class="cam-btn primary" id="btnSnap" style="display: none;" onclick="takeSnapshot()">
+        <i class="fa-solid fa-circle-dot"></i> Fotoğrafı Çek ve Hesapla
+      </button>
+      <button class="cam-btn" id="btnRetake" style="display: none;" onclick="retakePhoto()">
+        <i class="fa-solid fa-rotate-left"></i> Yeniden Çek
+      </button>
+    </div>
+
     <div class="form-group">
-      <label><i class="fa-solid fa-basket-shopping"></i> Dolaptaki Malzemeler</label>
-      <textarea id="chefIngredients" placeholder="Örn: 3 yumurta, 100g lor peyniri, yulaf, zeytinyağı, pul biber..."></textarea>
+      <label><i class="fa-solid fa-pen"></i> Ek Malzemeler (İsteğe Bağlı)</label>
+      <textarea id="chefIngredients" placeholder="Görünmeyen tuz, baharat, sos veya elindeki diğer malzemeleri ekle..."></textarea>
     </div>
 
     <div class="target-protein-row">
       <span>Hedef Protein:</span>
-      <div class="number-input-wrapper">
+      <div style="display: flex; align-items: center; gap: 6px;">
         <input type="number" id="chefTargetProtein" value="35" min="10" max="100">
         <span style="font-size: 0.8rem; color: var(--text-muted);">gram</span>
       </div>
@@ -333,12 +398,10 @@
     </button>
   </div>
 
-  <!-- Sonuç Kartı -->
   <div id="recipeResult" class="recipe-card">
     <div class="recipe-title" id="recipeTitle"></div>
     <div class="recipe-time">
-      <i class="fa-solid fa-clock"></i>
-      <span id="recipeTime"></span>
+      <i class="fa-solid fa-clock"></i> <span id="recipeTime"></span>
     </div>
 
     <div class="macro-grid">
@@ -371,60 +434,145 @@
     <ol class="instructions-list" id="recipeSteps"></ol>
   </div>
 
+  <canvas id="snapshotCanvas"></canvas>
+
   <script>
-    const btn = document.getElementById('btnGenerateRecipe');
+    let stream = null;
+    let currentBase64Image = null;
+
+    const video = document.getElementById('videoFeed');
+    const preview = document.getElementById('snapshotPreview');
+    const placeholder = document.getElementById('camPlaceholder');
+    const btnSnap = document.getElementById('btnSnap');
+    const btnRetake = document.getElementById('btnRetake');
+    const canvas = document.getElementById('snapshotCanvas');
+    const btnSubmit = document.getElementById('btnGenerateRecipe');
     const resultCard = document.getElementById('recipeResult');
 
-    btn.addEventListener('click', async () => {
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false
+        });
+        video.srcObject = stream;
+        video.style.display = 'block';
+        placeholder.style.display = 'none';
+        btnSnap.style.display = 'flex';
+      } catch (err) {
+        alert('Kamera açılamadı! İzinleri kontrol edin: ' + err.message);
+      }
+    }
+
+    function takeSnapshot() {
+      const maxDim = 800;
+      let w = video.videoWidth || 640;
+      let h = video.videoHeight || 480;
+
+      if (w > maxDim || h > maxDim) {
+        if (w > h) {
+          h = Math.round((h * maxDim) / w);
+          w = maxDim;
+        } else {
+          w = Math.round((w * maxDim) / h);
+          h = maxDim;
+        }
+      }
+
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, w, h);
+
+      const fullDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+      preview.src = fullDataUrl;
+      currentBase64Image = fullDataUrl.split(',')[1];
+
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      video.style.display = 'none';
+      preview.style.display = 'block';
+      btnSnap.style.display = 'none';
+      btnRetake.style.display = 'flex';
+
+      runRecipeGeneration();
+    }
+
+    function retakePhoto() {
+      currentBase64Image = null;
+      preview.style.display = 'none';
+      btnRetake.style.display = 'none';
+      startCamera();
+    }
+
+    async function runRecipeGeneration() {
       const ingredientsText = document.getElementById('chefIngredients').value.trim();
       const targetProtein = document.getElementById('chefTargetProtein').value || 35;
 
-      if (!ingredientsText) {
-        alert('Lütfen elindeki birkaç malzemeyi yaz.');
+      if (!ingredientsText && !currentBase64Image) {
+        alert('Lütfen kameradan bir kare çekin veya malzeme adı yazın.');
         return;
       }
 
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Şef Hazırlıyor...</span>';
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Görsel Analiz Ediliyor...</span>';
+      btnRetake.disabled = true;
 
       try {
-        const res = await fetch('/api/fridge-chef', {
+        // Doğrudan localhost:5000 Express sunucusuna hedefliyoruz
+        const targetUrl = `${window.location.protocol}//${window.location.hostname}:5000/api/fridge-chef`;
+
+        const res = await fetch(targetUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ingredientsText, targetProtein })
+          body: JSON.stringify({
+            ingredientsText,
+            imageBase64: currentBase64Image,
+            targetProtein
+          })
         });
 
-        const data = await res.json();
-        if (data.error) throw new Error(data.error);
+        const resText = await res.text();
+        let data;
+        try {
+          data = JSON.parse(resText);
+        } catch (parseErr) {
+          console.error("Gelen Ham Cevap:", resText);
+          throw new Error(`Sunucu yanıtı JSON değil (${res.status}): ${resText.slice(0, 120)}`);
+        }
 
-        // Başlık & Süre
+        if (!res.ok || data.error) {
+          throw new Error(data.error || `Sunucu Hatası (${res.status})`);
+        }
+
         document.getElementById('recipeTitle').textContent = data.recipeName || 'Fit Tarif';
         document.getElementById('recipeTime').textContent = `Hazırlık: ${data.prepTime || '15 dk'}`;
 
-        // Makrolar
         const macros = data.macros || {};
         document.getElementById('macroCal').textContent = macros.calories || macros.kalori || '-';
         document.getElementById('macroProtein').textContent = (macros.protein ? `${macros.protein}g` : '-');
         document.getElementById('macroCarb').textContent = (macros.carbs || macros.karbonhidrat ? `${macros.carbs || macros.karbonhidrat}g` : '-');
         document.getElementById('macroFat').textContent = (macros.fat || macros.yag ? `${macros.fat || macros.yag}g` : '-');
 
-        // Malzemeler
         const ingList = document.getElementById('recipeIngredients');
         ingList.innerHTML = (data.usedIngredients || []).map(item => `<li>${item}</li>`).join('');
 
-        // Hazırlanış
         const stepList = document.getElementById('recipeSteps');
         stepList.innerHTML = (data.instructions || []).map(step => `<li>${step}</li>`).join('');
 
         resultCard.style.display = 'block';
         resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } catch (err) {
-        alert('Tarif oluşturulamadı: ' + err.message);
+        alert('İşlem Hatası: ' + err.message);
       } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Fit Tarif Oluştur</span>';
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Fit Tarif Oluştur</span>';
+        btnRetake.disabled = false;
       }
-    });
+    }
+
+    btnSubmit.addEventListener('click', runRecipeGeneration);
   </script>
 </body>
 </html>
