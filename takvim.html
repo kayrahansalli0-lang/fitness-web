@@ -89,7 +89,7 @@
     }
 
     .day-cell {
-      min-height: 52px;
+      min-height: 54px;
       background: #111;
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -129,6 +129,37 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
+    }
+
+    /* Genel Özet İstatistikleri */
+    .overview-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .overview-box {
+      background: #111;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .overview-box .num {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--primary-orange);
+    }
+
+    .overview-box .label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
     }
 
     /* Aylık Özet İstatistikleri */
@@ -202,6 +233,8 @@
       border-radius: 20px 20px 0 0;
       padding: 20px;
       animation: slideUp 0.2s ease-out;
+      max-height: 85vh;
+      overflow-y: auto;
     }
 
     @keyframes slideUp {
@@ -300,9 +333,23 @@
     <div class="days-grid" id="daysGrid"></div>
   </div>
 
-  <!-- Aylık Toplam Bölge Sayımı -->
+  <!-- Aylık Özet Kartı -->
   <div class="summary-card">
-    <div class="summary-title" id="summaryMonthLabel">Bu Ayın Dağılımı</div>
+    <div class="summary-title" id="summaryMonthLabel">Bu Ayın Özeti</div>
+    
+    <!-- Toplam Sayaçlar -->
+    <div class="overview-row">
+      <div class="overview-box">
+        <div class="num" id="totalWorkoutDays">0</div>
+        <div class="label">İdman Günü</div>
+      </div>
+      <div class="overview-box">
+        <div class="num" id="totalRestDays" style="color: #78909C;">0</div>
+        <div class="label">Dinlenme Günü</div>
+      </div>
+    </div>
+
+    <!-- Bölge Dağılımı -->
     <div class="summary-grid" id="summaryGrid"></div>
   </div>
 
@@ -324,23 +371,25 @@
   </div>
 
   <script>
-    // 8 Bölge ve Belirlenen Renk Paleti
+    // Kas Grupları + Kardiyo + Rest Day
     const MUSCLE_GROUPS = {
-      bacak:    { name: "Bacak",    color: "#00E676" }, // Parlak Yeşil
-      gogus:    { name: "Göğüs",    color: "#FF3D00" }, // Kırmızı
-      omuz:     { name: "Omuz",     color: "#FF9100" }, // Turuncu
-      arka_kol: { name: "Arka Kol", color: "#FFD600" }, // Sarı
-      on_kol:   { name: "Ön Kol",   color: "#00E5FF" }, // Cyan / Açık Mavi
-      bilek:    { name: "Bilek",    color: "#D500F9" }, // Mor / Magenta
-      boyun:    { name: "Boyun",    color: "#76FF03" }, // Açık Fıstık Yeşili
-      sirt:     { name: "Sırt",     color: "#2979FF" }  // Mavi
+      gogus:    { name: "Göğüs",      color: "#FF3D00", type: "workout" },
+      sirt:     { name: "Sırt",       color: "#2979FF", type: "workout" },
+      omuz:     { name: "Omuz",       color: "#FF9100", type: "workout" },
+      arka_kol: { name: "Arka Kol",   color: "#FFD600", type: "workout" },
+      on_kol:   { name: "Ön Kol",     color: "#00E5FF", type: "workout" },
+      bacak:    { name: "Bacak",      color: "#00E676", type: "workout" },
+      karin:    { name: "Karın",      color: "#FF1493", type: "workout" },
+      bilek:    { name: "Bilek",      color: "#D500F9", type: "workout" },
+      boyun:    { name: "Boyun",      color: "#76FF03", type: "workout" },
+      kardiyo:  { name: "Kardiyo",    color: "#E040FB", type: "workout" },
+      rest:     { name: "Dinlenme",   color: "#78909C", type: "rest" }
     };
 
     let currentDate = new Date();
     let selectedDateKey = null;
     let tempSelectedMuscles = [];
 
-    // LocalStorage verisi formatı: { "2026-09-12": ["bacak", "gogus"] }
     function getWorkouts() {
       return JSON.parse(localStorage.getItem('fitness_workouts_data') || '{}');
     }
@@ -355,9 +404,9 @@
 
       const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
       document.getElementById('monthDisplay').textContent = `${monthNames[month]} ${year}`;
-      document.getElementById('summaryMonthLabel').textContent = `${monthNames[month]} ${year} Dağılımı`;
+      document.getElementById('summaryMonthLabel').textContent = `${monthNames[month]} ${year} Özeti`;
 
-      const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7; // Pazartesi 0
+      const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
       const totalDays = new Date(year, month + 1, 0).getDate();
 
       const daysGrid = document.getElementById('daysGrid');
@@ -366,14 +415,12 @@
       const workouts = getWorkouts();
       const today = new Date();
 
-      // Boşluk hücreleri
       for (let i = 0; i < firstDayIndex; i++) {
         const emptyCell = document.createElement('div');
         emptyCell.className = 'day-cell empty';
         daysGrid.appendChild(emptyCell);
       }
 
-      // Gün hücreleri
       for (let day = 1; day <= totalDays; day++) {
         const cell = document.createElement('div');
         cell.className = 'day-cell';
@@ -407,14 +454,26 @@
       const counts = {};
       Object.keys(MUSCLE_GROUPS).forEach(k => counts[k] = 0);
 
+      let totalWorkoutDaysCount = 0;
+      let totalRestDaysCount = 0;
+
       const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
       for (const [date, list] of Object.entries(workouts)) {
-        if (date.startsWith(prefix)) {
+        if (date.startsWith(prefix) && list.length > 0) {
+          const hasWorkout = list.some(item => MUSCLE_GROUPS[item] && MUSCLE_GROUPS[item].type === 'workout');
+          const hasRest = list.includes('rest');
+
+          if (hasWorkout) totalWorkoutDaysCount++;
+          if (hasRest) totalRestDaysCount++;
+
           list.forEach(item => {
             if (counts[item] !== undefined) counts[item]++;
           });
         }
       }
+
+      document.getElementById('totalWorkoutDays').textContent = totalWorkoutDaysCount;
+      document.getElementById('totalRestDays').textContent = totalRestDaysCount;
 
       const summaryGrid = document.getElementById('summaryGrid');
       summaryGrid.innerHTML = '';
@@ -433,12 +492,7 @@
       });
     }
 
-    function openModal(dateKey, day, monthName) {
-      selectedDateKey = dateKey;
-      const workouts = getWorkouts();
-      tempSelectedMuscles = [...(workouts[dateKey] || [])];
-
-      document.getElementById('modalDateLabel').textContent = `${day} ${monthName} İdmanı`;
+    function renderModalButtons() {
       const optionsContainer = document.getElementById('muscleOptions');
       optionsContainer.innerHTML = '';
 
@@ -450,17 +504,35 @@
           <span>${meta.name}</span>
         `;
         btn.onclick = () => {
-          if (tempSelectedMuscles.includes(key)) {
-            tempSelectedMuscles = tempSelectedMuscles.filter(m => m !== key);
-            btn.classList.remove('selected');
+          if (key === 'rest') {
+            // Dinlenme seçildiyse diğerlerini sıfırla
+            if (tempSelectedMuscles.includes('rest')) {
+              tempSelectedMuscles = [];
+            } else {
+              tempSelectedMuscles = ['rest'];
+            }
           } else {
-            tempSelectedMuscles.push(key);
-            btn.classList.add('selected');
+            // İdman grubu seçildiyse dinlenmeyi kaldır
+            tempSelectedMuscles = tempSelectedMuscles.filter(m => m !== 'rest');
+            if (tempSelectedMuscles.includes(key)) {
+              tempSelectedMuscles = tempSelectedMuscles.filter(m => m !== key);
+            } else {
+              tempSelectedMuscles.push(key);
+            }
           }
+          renderModalButtons();
         };
         optionsContainer.appendChild(btn);
       });
+    }
 
+    function openModal(dateKey, day, monthName) {
+      selectedDateKey = dateKey;
+      const workouts = getWorkouts();
+      tempSelectedMuscles = [...(workouts[dateKey] || [])];
+
+      document.getElementById('modalDateLabel').textContent = `${day} ${monthName} Kaydı`;
+      renderModalButtons();
       document.getElementById('workoutModal').classList.add('active');
     }
 
