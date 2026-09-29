@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <link rel="icon" type="image/png" href="Gemini_Generated_Image_bjczfnbjczfnbjcz (1).jpg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Antrenman Takvimi & Dağılımı</title>
@@ -12,6 +11,7 @@
       --bg-card: #161616;
       --border-color: #262626;
       --primary-orange: #ff6b00;
+      --gold-pr: #ffd700;
       --text-main: #f5f5f5;
       --text-muted: #8a8a8a;
     }
@@ -31,7 +31,6 @@
       min-height: 100vh;
     }
 
-    /* Başlık ve Ay Değiştirici */
     .header {
       display: flex;
       justify-content: space-between;
@@ -64,7 +63,6 @@
       border-color: var(--primary-orange);
     }
 
-    /* Takvim Grid */
     .calendar-container {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -90,7 +88,7 @@
     }
 
     .day-cell {
-      min-height: 54px;
+      min-height: 56px;
       background: #111;
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -99,6 +97,7 @@
       flex-direction: column;
       align-items: center;
       cursor: pointer;
+      position: relative;
       transition: all 0.15s ease;
     }
 
@@ -112,10 +111,39 @@
       border-color: var(--primary-orange);
     }
 
+    /* Rekor / PR Günü Vurgusu */
+    .day-cell.is-pr {
+      background: linear-gradient(180deg, rgba(255, 215, 0, 0.15) 0%, #151510 100%);
+      border-color: var(--gold-pr) !important;
+      box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.2), 0 0 8px rgba(255, 215, 0, 0.15);
+    }
+
+    .day-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2px;
+      margin-bottom: 3px;
+    }
+
     .day-num {
       font-size: 0.78rem;
       font-weight: 700;
-      margin-bottom: 3px;
+    }
+
+    .day-badges {
+      display: flex;
+      gap: 3px;
+      font-size: 0.6rem;
+    }
+
+    .badge-icon-pr {
+      color: var(--gold-pr);
+    }
+
+    .badge-icon-note {
+      color: var(--text-muted);
     }
 
     .day-dots {
@@ -132,11 +160,11 @@
       border-radius: 50%;
     }
 
-    /* Genel Özet İstatistikleri */
+    /* Genel Özet İstatistikleri (3'lü Sayaç Izgarası) */
     .overview-row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
       margin-bottom: 14px;
     }
 
@@ -144,26 +172,30 @@
       background: #111;
       border: 1px solid var(--border-color);
       border-radius: 10px;
-      padding: 12px;
+      padding: 10px 6px;
       text-align: center;
     }
 
     .overview-box .num {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: 900;
       color: var(--primary-orange);
     }
 
+    .overview-box .num.gold {
+      color: var(--gold-pr);
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+    }
+
     .overview-box .label {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 2px;
+      letter-spacing: 0.4px;
+      margin-top: 3px;
     }
 
-    /* Aylık Özet İstatistikleri */
     .summary-card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -211,12 +243,12 @@
       color: #fff;
     }
 
-    /* Modal / Seçim Alanı */
+    /* Modal */
     .modal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.8);
       z-index: 999;
       justify-content: center;
       align-items: flex-end;
@@ -234,7 +266,7 @@
       border-radius: 20px 20px 0 0;
       padding: 20px;
       animation: slideUp 0.2s ease-out;
-      max-height: 85vh;
+      max-height: 90vh;
       overflow-y: auto;
     }
 
@@ -263,20 +295,49 @@
       cursor: pointer;
     }
 
+    .pr-toggle-box {
+      margin-bottom: 14px;
+    }
+
+    .pr-btn {
+      width: 100%;
+      background: #1e1b10;
+      border: 1px dashed #554400;
+      color: #e5c158;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .pr-btn.active {
+      background: #ffd700;
+      color: #000;
+      border-style: solid;
+      border-color: #ffd700;
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+    }
+
     .muscle-options {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .muscle-btn {
       background: #1c1c1c;
       border: 1px solid var(--border-color);
       color: var(--text-main);
-      padding: 10px 12px;
+      padding: 9px 11px;
       border-radius: 10px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
       display: flex;
@@ -288,6 +349,39 @@
     .muscle-btn.selected {
       border-color: #fff;
       background: #252525;
+    }
+
+    .note-section {
+      margin-bottom: 16px;
+    }
+
+    .note-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .note-textarea {
+      width: 100%;
+      height: 70px;
+      background: #101010;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px;
+      color: #fff;
+      font-size: 0.82rem;
+      resize: none;
+      outline: none;
+    }
+
+    .note-textarea:focus {
+      border-color: var(--primary-orange);
     }
 
     .modal-actions {
@@ -319,14 +413,12 @@
 </head>
 <body>
 
-  <!-- Başlık -->
   <div class="header">
     <button class="nav-btn" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
     <div class="month-title" id="monthDisplay">Eylül 2026</div>
     <button class="nav-btn" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
   </div>
 
-  <!-- Takvim Grid -->
   <div class="calendar-container">
     <div class="weekdays">
       <div>Pzt</div><div>Sal</div><div>Çar</div><div>Per</div><div>Cum</div><div>Cmt</div><div>Paz</div>
@@ -334,27 +426,29 @@
     <div class="days-grid" id="daysGrid"></div>
   </div>
 
-  <!-- Aylık Özet Kartı -->
   <div class="summary-card">
     <div class="summary-title" id="summaryMonthLabel">Bu Ayın Özeti</div>
     
-    <!-- Toplam Sayaçlar -->
+    <!-- 3'lü Genel Sayaç -->
     <div class="overview-row">
       <div class="overview-box">
         <div class="num" id="totalWorkoutDays">0</div>
-        <div class="label">İdman Günü</div>
+        <div class="label">İdman</div>
       </div>
       <div class="overview-box">
         <div class="num" id="totalRestDays" style="color: #78909C;">0</div>
-        <div class="label">Dinlenme Günü</div>
+        <div class="label">Dinlenme</div>
+      </div>
+      <div class="overview-box">
+        <div class="num gold" id="totalPrDays">0</div>
+        <div class="label">Rekor (PR)</div>
       </div>
     </div>
 
-    <!-- Bölge Dağılımı -->
     <div class="summary-grid" id="summaryGrid"></div>
   </div>
 
-  <!-- Seçim Modalı -->
+  <!-- Modal -->
   <div class="modal" id="workoutModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -362,7 +456,22 @@
         <button class="close-btn" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
+      <!-- PR / Rekor Günü Butonu -->
+      <div class="pr-toggle-box">
+        <button class="pr-btn" id="prBtn" onclick="togglePr()">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Bu Gün Rekor / PR Günü!</span>
+        </button>
+      </div>
+
+      <!-- Kas Grupları -->
       <div class="muscle-options" id="muscleOptions"></div>
+
+      <!-- Özel Not Alanı -->
+      <div class="note-section">
+        <div class="note-label"><i class="fa-solid fa-pen"></i> Günün Notu & Ağırlıklar</div>
+        <textarea class="note-textarea" id="noteInput" placeholder="Örn: Bench 100kg 1RM denendi, squat 4x8 90kg..."></textarea>
+      </div>
 
       <div class="modal-actions">
         <button class="clear-btn" onclick="clearDay()">Günü Temizle</button>
@@ -372,7 +481,6 @@
   </div>
 
   <script>
-    // Kas Grupları + Kardiyo + Rest Day
     const MUSCLE_GROUPS = {
       gogus:    { name: "Göğüs",      color: "#FF3D00", type: "workout" },
       sirt:     { name: "Sırt",       color: "#2979FF", type: "workout" },
@@ -390,9 +498,19 @@
     let currentDate = new Date();
     let selectedDateKey = null;
     let tempSelectedMuscles = [];
+    let tempIsPr = false;
 
     function getWorkouts() {
-      return JSON.parse(localStorage.getItem('fitness_workouts_data') || '{}');
+      const raw = JSON.parse(localStorage.getItem('fitness_workouts_data') || '{}');
+      const normalized = {};
+      for (const [date, val] of Object.entries(raw)) {
+        if (Array.isArray(val)) {
+          normalized[date] = { muscles: val, note: "", isPr: false };
+        } else {
+          normalized[date] = val;
+        }
+      }
+      return normalized;
     }
 
     function saveWorkouts(data) {
@@ -430,17 +548,32 @@
         if (isToday) cell.classList.add('today');
 
         const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const dayWorkouts = workouts[dateKey] || [];
+        const dayData = workouts[dateKey] || { muscles: [], note: "", isPr: false };
+
+        if (dayData.isPr) {
+          cell.classList.add('is-pr');
+        }
 
         let dotsHtml = '';
-        dayWorkouts.forEach(key => {
+        dayData.muscles.forEach(key => {
           if (MUSCLE_GROUPS[key]) {
             dotsHtml += `<div class="dot" style="background: ${MUSCLE_GROUPS[key].color};"></div>`;
           }
         });
 
+        let badgesHtml = '';
+        if (dayData.isPr) {
+          badgesHtml += `<i class="fa-solid fa-trophy badge-icon-pr" title="Rekor Günü"></i>`;
+        }
+        if (dayData.note && dayData.note.trim() !== '') {
+          badgesHtml += `<i class="fa-solid fa-note-sticky badge-icon-note" title="Not Var"></i>`;
+        }
+
         cell.innerHTML = `
-          <span class="day-num">${day}</span>
+          <div class="day-header">
+            <span class="day-num">${day}</span>
+            <div class="day-badges">${badgesHtml}</div>
+          </div>
           <div class="day-dots">${dotsHtml}</div>
         `;
 
@@ -457,24 +590,30 @@
 
       let totalWorkoutDaysCount = 0;
       let totalRestDaysCount = 0;
+      let totalPrDaysCount = 0;
 
       const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
-      for (const [date, list] of Object.entries(workouts)) {
-        if (date.startsWith(prefix) && list.length > 0) {
-          const hasWorkout = list.some(item => MUSCLE_GROUPS[item] && MUSCLE_GROUPS[item].type === 'workout');
-          const hasRest = list.includes('rest');
+      for (const [date, data] of Object.entries(workouts)) {
+        if (date.startsWith(prefix)) {
+          if (data.isPr) totalPrDaysCount++;
 
-          if (hasWorkout) totalWorkoutDaysCount++;
-          if (hasRest) totalRestDaysCount++;
+          if (data.muscles && data.muscles.length > 0) {
+            const hasWorkout = data.muscles.some(item => MUSCLE_GROUPS[item] && MUSCLE_GROUPS[item].type === 'workout');
+            const hasRest = data.muscles.includes('rest');
 
-          list.forEach(item => {
-            if (counts[item] !== undefined) counts[item]++;
-          });
+            if (hasWorkout) totalWorkoutDaysCount++;
+            if (hasRest) totalRestDaysCount++;
+
+            data.muscles.forEach(item => {
+              if (counts[item] !== undefined) counts[item]++;
+            });
+          }
         }
       }
 
       document.getElementById('totalWorkoutDays').textContent = totalWorkoutDaysCount;
       document.getElementById('totalRestDays').textContent = totalRestDaysCount;
+      document.getElementById('totalPrDays').textContent = totalPrDaysCount;
 
       const summaryGrid = document.getElementById('summaryGrid');
       summaryGrid.innerHTML = '';
@@ -506,14 +645,12 @@
         `;
         btn.onclick = () => {
           if (key === 'rest') {
-            // Dinlenme seçildiyse diğerlerini sıfırla
             if (tempSelectedMuscles.includes('rest')) {
               tempSelectedMuscles = [];
             } else {
               tempSelectedMuscles = ['rest'];
             }
           } else {
-            // İdman grubu seçildiyse dinlenmeyi kaldır
             tempSelectedMuscles = tempSelectedMuscles.filter(m => m !== 'rest');
             if (tempSelectedMuscles.includes(key)) {
               tempSelectedMuscles = tempSelectedMuscles.filter(m => m !== key);
@@ -525,14 +662,33 @@
         };
         optionsContainer.appendChild(btn);
       });
+
+      const prBtn = document.getElementById('prBtn');
+      if (tempIsPr) {
+        prBtn.classList.add('active');
+        prBtn.innerHTML = `<i class="fa-solid fa-trophy"></i> <span>🔥 REKOR / PR GÜNÜ AKTİF</span>`;
+      } else {
+        prBtn.classList.remove('active');
+        prBtn.innerHTML = `<i class="fa-solid fa-trophy"></i> <span>Bu Gün Rekor / PR Günü!</span>`;
+      }
+    }
+
+    function togglePr() {
+      tempIsPr = !tempIsPr;
+      renderModalButtons();
     }
 
     function openModal(dateKey, day, monthName) {
       selectedDateKey = dateKey;
       const workouts = getWorkouts();
-      tempSelectedMuscles = [...(workouts[dateKey] || [])];
+      const dayData = workouts[dateKey] || { muscles: [], note: "", isPr: false };
+
+      tempSelectedMuscles = [...dayData.muscles];
+      tempIsPr = !!dayData.isPr;
 
       document.getElementById('modalDateLabel').textContent = `${day} ${monthName} Kaydı`;
+      document.getElementById('noteInput').value = dayData.note || "";
+
       renderModalButtons();
       document.getElementById('workoutModal').classList.add('active');
     }
@@ -544,9 +700,14 @@
     function saveDay() {
       if (!selectedDateKey) return;
       const workouts = getWorkouts();
+      const noteVal = document.getElementById('noteInput').value.trim();
 
-      if (tempSelectedMuscles.length > 0) {
-        workouts[selectedDateKey] = tempSelectedMuscles;
+      if (tempSelectedMuscles.length > 0 || noteVal !== '' || tempIsPr) {
+        workouts[selectedDateKey] = {
+          muscles: tempSelectedMuscles,
+          note: noteVal,
+          isPr: tempIsPr
+        };
       } else {
         delete workouts[selectedDateKey];
       }
